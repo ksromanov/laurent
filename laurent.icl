@@ -31,7 +31,7 @@ degree { expon = _, coeffs } = length coeffs
 shift :: Int (Laurent a) -> (Laurent a)
 shift t { expon, coeffs } = { expon = expon + 1, coeffs }
 
-// Красивый вывод на печать, квадратичный по длине (см foldr)
+// Красивый вывод на печать, квадратичный по длине (см foldl)
 instance toString (Laurent a) | toString a & toReal a where
     toString { expon, coeffs } = case stringMonomials of
             []     -> "0"
@@ -91,9 +91,29 @@ instance * (Laurent a) | fromReal a & toReal a & * a & + a where
     (*) { expon = a_expon, coeffs = a } { expon = b_expon, coeffs = b } =
         { expon = a_expon + b_expon, coeffs = mul_poly a b }
         where scale v poly = map ((*) v) poly
-//              add a b = zipWith (+) a b
-              mul_poly ys xs =
-                foldr (\y zs -> let [v:vs] = scale y xs in [v : (vs + zs)]) [] b
+              mul_poly :: [a] [a] -> [a]
+              mul_poly ys xs = abort ""
+
+multiply :: (Laurent a) (Laurent a) -> (Laurent a) | fromReal a & + a & * a
+multiply { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b } =
+    { expon = exp_a + exp_b, coeffs = go coeffs_a [] coeffs_b ++ return coeffs_a coeffs_b}
+    where go [a:a_tail] [] b = go a_tail [a] b
+          go [a:a_tail] rest_a b = [sum rest_a b : go a_tail [a : rest_a] b]
+          go [] _ _ = []
+
+          return _ [] = []
+          return a b=:[_:b_tail] = [sum a b : return a b_tail]
+
+          sum :: [a] [a] -> a | fromReal a & + a & * a
+          sum a b = foldl (+) (fromReal 0.0) (zipWith (*) a b)
+
+// Возможно стоит использовать библиотечную.
+zipWith :: !(a b -> c) ![a] ![b] -> [c]
+zipWith _ [] py = []
+zipWith _ px [] = []
+zipWith op [x:px] [y:py] = [op x y : zipWith op px py]
+
+//                foldr (\y zs -> let [v:vs] = scale y xs in [v : (vs + zs)]) [] b
 
 /*
 scale :: a (Laurent a) -> (Laurent a) | * a
@@ -101,10 +121,14 @@ scale s { expon = expon, coeffs = coeffs } =
             { expon = expon, coeffs = map ((*) s) coeffs }
 */
 
-/*
-Start :: Laurent Real
-Start = trim { expon = -2, coeffs = [0.0, 2.0, 1.0, -0.5, 0.0] } // { expon = 0, coeffs = [1.0, 2.0, 1.0] } + { expon = 0, coeffs = [0.0, 2.0, 3.0] }
-*/
-Start :: String
-Start = //toString { expon = -3, coeffs = [1.0, 0.0, 2.0, 1.0, 1.0, 0.0, 6.0, ~2.2] }
-        toString ({expon = 0, coeffs = [1.0, 2.0]} + {expon = 1, coeffs = [1.0, 2.0]})
+Start :: [String]
+Start =
+        map toString
+        [ trim {expon = -2, coeffs = [0.0, 2.0, 1.0, -0.5, 0.0]},
+          {expon = -3, coeffs = [1.0, 0.0, 2.0, 1.0, 1.0, 0.0, 6.0, ~2.2]},
+          {expon = 0, coeffs = [1.0, 2.0]} + {expon = 1, coeffs = [1.0, 2.0]},
+          {expon = 0, coeffs = [1.0, 2.0]} + {expon = 1, coeffs = [1.0, 2.0]},
+          multiply a b
+        ]
+        where a = {expon = 0, coeffs = [1.0, 2.0]}
+              b = {expon = 1, coeffs = [1.0, 2.0]}
