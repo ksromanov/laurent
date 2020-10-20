@@ -19,6 +19,22 @@ fromCoeffs coeffs = fromShiftCoeffs 0 coeffs
 fromShiftCoeffs :: Int [a] -> Laurent a
 fromShiftCoeffs expon coeffs = { expon = expon, coeffs = coeffs }
 
+// Вычисление в точке
+evaluate :: (Laurent a) a -> a | fromReal a & +a & *a & /a
+evaluate { expon, coeffs } x = lowest_power * evaluate_poly x coeffs
+    where lowest_power
+            | expon > 0 = pow x expon
+            | otherwise = pow inv_x (~expon)
+
+          inv_x = fromReal 1.0 / x
+
+          pow x 0 = fromReal 1.0
+          pow x n = x * pow x (n - 1)
+
+          evaluate_poly x coeffs = fst
+            (foldl (\(sum, x_n) c -> (sum + x_n * c, x_n * x))
+                                    (fromReal 0.0, fromReal 1.0) coeffs)
+
 // Селекторы и свойства
 // Минимальная и максимальная степени
 bounds :: (Laurent a) -> (Int, Int)
@@ -128,7 +144,8 @@ Start =
           {expon = -3, coeffs = [1.0, 0.0, 2.0, 1.0, 1.0, 0.0, 6.0, ~2.2]},
           {expon = 0, coeffs = [1.0, 2.0]} + {expon = 1, coeffs = [1.0, 2.0]},
           {expon = 0, coeffs = [1.0, 2.0]} + {expon = 1, coeffs = [1.0, 2.0]},
-          multiply a b
+          multiply a b,
+          const (evaluate a 2.0)
         ]
         where a = {expon = 0, coeffs = [1.0, 2.0]}
               b = {expon = 1, coeffs = [1.0, 2.0]}
