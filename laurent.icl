@@ -104,18 +104,11 @@ trim { expon = expon, coeffs = coeffs } =
           (coeffs``, _)     = span (\a -> toReal a <> 0.0) coeffs`
 
 instance * (Laurent a) | fromReal a & toReal a & * a & + a where
-    (*) { expon = a_expon, coeffs = a } { expon = b_expon, coeffs = b } =
-        { expon = a_expon + b_expon, coeffs = mul_poly a b }
-        where scale v poly = map ((*) v) poly
-              mul_poly :: [a] [a] -> [a]
-              mul_poly ys xs = abort ""
+    (*) { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b } =
+                                            { expon = exp_a + exp_b, coeffs = go coeffs_a [] coeffs_b }
 
-multiply :: (Laurent a) (Laurent a) -> (Laurent a) | fromReal a & + a & * a
-multiply { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b } =
-    { expon = exp_a + exp_b, coeffs = go coeffs_a [] coeffs_b ++ return coeffs_a coeffs_b}
-    where go [a:a_tail] [] b = go a_tail [a] b
-          go [a:a_tail] rest_a b = [sum rest_a b : go a_tail [a : rest_a] b]
-          go [] _ _ = []
+    where go [a:a_tail] rest_a b = [sum [a:rest_a] b : go a_tail [a:rest_a] b]
+          go [] rest_a b = return rest_a (tl b)
 
           return _ [] = []
           return a b=:[_:b_tail] = [sum a b : return a b_tail]
@@ -129,14 +122,6 @@ zipWith _ [] py = []
 zipWith _ px [] = []
 zipWith op [x:px] [y:py] = [op x y : zipWith op px py]
 
-//                foldr (\y zs -> let [v:vs] = scale y xs in [v : (vs + zs)]) [] b
-
-/*
-scale :: a (Laurent a) -> (Laurent a) | * a
-scale s { expon = expon, coeffs = coeffs } =
-            { expon = expon, coeffs = map ((*) s) coeffs }
-*/
-
 Start :: [String]
 Start =
         map toString
@@ -144,8 +129,27 @@ Start =
           {expon = -3, coeffs = [1.0, 0.0, 2.0, 1.0, 1.0, 0.0, 6.0, ~2.2]},
           {expon = 0, coeffs = [1.0, 2.0]} + {expon = 1, coeffs = [1.0, 2.0]},
           {expon = 0, coeffs = [1.0, 2.0]} + {expon = 1, coeffs = [1.0, 2.0]},
-          multiply a b,
-          const (evaluate a 2.0)
+          a * b,
+          const (evaluate a 2.0) + const (evaluate b 2.0),
+          const (evaluate (a + b) 2.0),
+          (const 1.0) * (const 1.0),
+          (const 3.0) * (const 2.0),
+          a * a
+        ] ++ ["\n\n\n"] ++
+        map toString
+        [
+          (const 1) * (const 1),
+          (const 3) * (const 2),
+          (fromCoeffs [2, 3, 4, 5, 6]) * (const 2),
+          (const 2) * (fromCoeffs [2, 3, 4, 5, 6]),
+          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 1])
+        ] ++ ["\n\n\n"] ++
+        map toString
+        [
+          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [1, 0, 0]),
+          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 1, 0]),
+          (fromCoeffs [0, 1, 0]) * (fromCoeffs [2, 3, 4, 5, 6]),
+          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 0, 1])
         ]
         where a = {expon = 0, coeffs = [1.0, 2.0]}
               b = {expon = 1, coeffs = [1.0, 2.0]}
