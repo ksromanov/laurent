@@ -134,7 +134,8 @@ Start =
           const (evaluate (a + b) 2.0),
           (const 1.0) * (const 1.0),
           (const 3.0) * (const 2.0),
-          a * a
+          const (evaluate a 2.0) * const (evaluate b 2.0),
+          const (evaluate (a * b) 2.0)
         ] ++ ["\n\n\n"] ++
         map toString
         [
@@ -149,7 +150,9 @@ Start =
           (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [1, 0, 0]),
           (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 1, 0]),
           (fromCoeffs [0, 1, 0]) * (fromCoeffs [2, 3, 4, 5, 6]),
-          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 0, 1])
+          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 0, 1]),
+          const (evaluate ((fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [2, 3, 4, 5, 6])) 8),
+          const ((evaluate (fromCoeffs [2, 3, 4, 5, 6]) 8) * (evaluate (fromCoeffs [2, 3, 4, 5, 6]) 8))
         ]
         where a = {expon = 0, coeffs = [1.0, 2.0]}
               b = {expon = 1, coeffs = [1.0, 2.0]}
