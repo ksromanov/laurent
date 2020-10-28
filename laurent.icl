@@ -82,13 +82,13 @@ instance toString (Laurent a) | toString a & toReal a where
                 | exp < 0  = "1.0/" +++ toStringPow exp
                 | exp == 0 = "1"
 
-instance + (Laurent a) | fromInt a & + a where
+instance + (Laurent a) | fromInt a & + a & == a where
     (+) { expon = a_expon, coeffs = a } { expon = b_expon, coeffs = b } =
-        { expon = min a_expon b_expon, coeffs = opShifted (+) (a_expon - b_expon) a b}
+        trim { expon = min a_expon b_expon, coeffs = opShifted (+) (a_expon - b_expon) a b}
 
-instance - (Laurent a) | fromInt a &  - a where
+instance - (Laurent a) | fromInt a &  - a & == a where
     (-) { expon = a_expon, coeffs = a } { expon = b_expon, coeffs = b } =
-        { expon = min a_expon b_expon, coeffs = opShifted (-) (a_expon - b_expon) a b}
+        trim { expon = min a_expon b_expon, coeffs = opShifted (-) (a_expon - b_expon) a b}
 
 // Сложение или вычитание со сдвигом,
 //  позитивный сдвиг - px начинается раньше
