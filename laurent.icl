@@ -6,7 +6,9 @@ import StdMaybe
 
 // Полином Лорана - минимальная степень expon
 // может быть как больше, так и меньше 0.
-// коэффициенты [coeffs] отсчитываются от expon выше.
+// Коэффициенты [coeffs] отсчитываются от expon выше.
+// Степени в [coeffs] расположены справа налево:
+//      [1, 2, 3] == 3z^2 + 2z + 1
 :: Laurent a = { expon :: Int, coeffs :: !.[a] }
 
 // Конструкторы (константа, коэффициенты полинома, смещённый полином)
@@ -56,7 +58,7 @@ shift t { expon, coeffs } = { expon = expon + 1, coeffs }
 
 // Красивый вывод на печать, квадратичный по длине (см foldl)
 instance toString (Laurent a) | toString a & toReal a where
-    toString { expon, coeffs } = case stringMonomials of
+    toString { expon, coeffs } = case reverse stringMonomials of
             []     -> "0"
             [(a,_):ax] -> foldl (\r (mono, coeff)
                                 | toReal coeff > 0.0 -> r +++ "+" +++ mono
