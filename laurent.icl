@@ -1,4 +1,4 @@
-/* Полиномы Лорана, скопированные с numeric-prelude */
+/* Полиномы Лорана творчески скопированные с numeric-prelude */
 module laurent
 import StdEnv
 import StdOverloaded
@@ -19,21 +19,28 @@ fromCoeffs coeffs = fromShiftCoeffs 0 coeffs
 fromShiftCoeffs :: Int [a] -> Laurent a
 fromShiftCoeffs expon coeffs = { expon = expon, coeffs = coeffs }
 
+// Вспомогательные значения a
+zero :: a | fromInt a
+zero = fromInt 0
+
+one :: a | fromInt a
+one = fromInt 0
+
 // Вычисление в точке
-evaluate :: (Laurent a) a -> a | fromReal a & +a & *a & /a
+evaluate :: (Laurent a) a -> a | fromInt a & +a & *a & /a
 evaluate { expon, coeffs } x = lowest_power * evaluate_poly x coeffs
     where lowest_power
             | expon > 0 = pow x expon
             | otherwise = pow inv_x (~expon)
 
-          inv_x = fromReal 1.0 / x
+          inv_x = one / x
 
-          pow x 0 = fromReal 1.0
+          pow x 0 = one
           pow x n = x * pow x (n - 1)
 
           evaluate_poly x coeffs = fst
             (foldl (\(sum, x_n) c -> (sum + x_n * c, x_n * x))
-                                    (fromReal 0.0, fromReal 1.0) coeffs)
+                                     (zero, one) coeffs)
 
 // Селекторы и свойства
 // Минимальная и максимальная степени
@@ -75,35 +82,35 @@ instance toString (Laurent a) | toString a & toReal a where
                 | exp < 0  = "1.0/" +++ toStringPow exp
                 | exp == 0 = "1"
 
-instance + (Laurent a) | fromReal a & toReal a & + a where
+instance + (Laurent a) | fromInt a & + a where
     (+) { expon = a_expon, coeffs = a } { expon = b_expon, coeffs = b } =
         { expon = min a_expon b_expon, coeffs = opShifted (+) (a_expon - b_expon) a b}
 
-instance - (Laurent a) | fromReal a & toReal a & - a where
+instance - (Laurent a) | fromInt a &  - a where
     (-) { expon = a_expon, coeffs = a } { expon = b_expon, coeffs = b } =
         { expon = min a_expon b_expon, coeffs = opShifted (-) (a_expon - b_expon) a b}
 
 // Сложение или вычитание со сдвигом,
 //  позитивный сдвиг - px начинается раньше
 //  негативный сдвиг - py начинается раньше
-opShifted :: (a a -> a) Int [a] [a] -> [a] | fromReal a & toReal a
+opShifted :: (a a -> a) Int [a] [a] -> [a] | fromInt a
 opShifted op del px py
-    | del > 0  = opShifted op (del - 1) [(fromReal 0.0):px] py
+    | del > 0  = opShifted op (del - 1) [zero:px] py
     | del == 0 = zipWith` op px py
-    | del < 0  = opShifted op (del + 1) px [(fromReal 0.0):py]
+    | del < 0  = opShifted op (del + 1) px [zero:py]
     where zipWith` _ [] py = map op` py
           zipWith` _ px [] = px
           zipWith` op [x:px] [y:py] = [op x y : zipWith` op px py]
-          op` x => op (fromReal 0.0) x
+          op` x => op zero x
 
 // Стирание лишних нулей с разных сторон
-trim :: (Laurent a) -> (Laurent a) | toReal a
+trim :: (Laurent a) -> (Laurent a) | fromInt a & == a
 trim { expon = expon, coeffs = coeffs } =
             { expon = expon + length zeroes, coeffs = coeffs`` }
-    where (zeroes, coeffs`) = span (\a -> toReal a == 0.0) coeffs
-          (coeffs``, _)     = span (\a -> toReal a <> 0.0) coeffs`
+    where (zeroes, coeffs`) = span ((==) zero) coeffs
+          (coeffs``, _)     = span (\a -> not (a == zero)) coeffs`
 
-instance * (Laurent a) | fromReal a & toReal a & * a & + a where
+instance * (Laurent a) | fromInt a & * a & + a where
     (*) { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b } =
                                             { expon = exp_a + exp_b, coeffs = go coeffs_a [] coeffs_b }
 
@@ -113,8 +120,17 @@ instance * (Laurent a) | fromReal a & toReal a & * a & + a where
           return _ [] = []
           return a b=:[_:b_tail] = [sum a b : return a b_tail]
 
-          sum :: [a] [a] -> a | fromReal a & + a & * a
-          sum a b = foldl (+) (fromReal 0.0) (zipWith (*) a b)
+          sum :: [a] [a] -> a | fromInt a & + a & * a
+          sum a b = foldl (+) zero (zipWith (*) a b)
+
+// Деление при котором остаток выбрасывается.
+instance / (Laurent a) | fromInt a & / a & - a where
+    (/) { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b } =
+                                            abort "not implemented yet"
+
+
+div :: (Laurent a) -> (Laurent a) | fromInt a
+div _ = abort "not implemented"
 
 // Возможно стоит использовать библиотечную.
 zipWith :: !(a b -> c) ![a] ![b] -> [c]
