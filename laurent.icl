@@ -127,22 +127,22 @@ instance * (Laurent a) | fromInt a & * a & + a where
 
 // Деление при котором остаток выбрасывается.
 instance / (Laurent a) | fromInt a & / a & - a & == a where
-    (/) a b = fst (div a b)
+    (/) a b = fst (divmod a b)
 
 // Деление полинома a на полином b с остатком. Возвращаемое значение - (частное, остаток)
-div :: (Laurent a) (Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a
-div { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b } =
-        (trim { expon = exp_a - exp_b, coeffs = reverse (fst poly_divided) }, 
+divmod :: (Laurent a) (Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a
+divmod { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b } =
+          (trim { expon = exp_a - exp_b, coeffs = reverse (fst poly_divided) },
                         trim { expon = exp_a, coeffs = reverse (snd poly_divided) })
 
-    where poly_divided = go (length coeffs_a) (reverse coeffs_a) (length coeffs_b) (reverse coeffs_b)
-          go :: Int [a] Int [a] -> ([a], [a]) | fromInt a & / a
-          go len_a [a:a_rest] len_b [b:b_rest]
-            | len_a < len_b = ([zero], [a:a_rest])
-            | otherwise = ([quotient:quotient_rest], residue)
-                where quotient = a/b
-                      residue` = zipWith (-) a_rest b_rest ++ drop (len_b - 1) [a:a_rest]
-                      (quotient_rest, residue) = go (len_a - 1) a_rest len_b [b:b_rest]
+       where poly_divided = go (length coeffs_a) (reverse coeffs_a) (length coeffs_b) (reverse coeffs_b)
+             go :: Int [a] Int [a] -> ([a], [a]) | fromInt a & / a
+             go len_a [a:a_rest] len_b [b:b_rest]
+               | len_a < len_b = ([zero], [a:a_rest])
+               | otherwise = ([quotient:quotient_rest], residue)
+                   where quotient = a/b
+                         residue` = zipWith (-) a_rest b_rest ++ drop (len_b - 1) [a:a_rest]
+                         (quotient_rest, residue) = go (len_a - 1) a_rest len_b [b:b_rest]
 
 // Возможно стоит использовать библиотечную.
 zipWith :: !(a b -> c) ![a] ![b] -> [c]
@@ -188,4 +188,4 @@ Start =
         ]
         where a = {expon = 0, coeffs = [1.0, 2.0]}
               b = {expon = 1, coeffs = [1.0, 2.0]}
-              (zx, rx) = div (fromCoeffs [2, 3, 4, 5, 6]) (fromCoeffs [0, 0, 1])
+              (zx, rx) = divmod (fromCoeffs [2, 3, 4, 5, 6]) (fromCoeffs [0, 0, 1])
