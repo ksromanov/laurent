@@ -132,7 +132,8 @@ instance / (Laurent a) | fromInt a & / a & - a & == a where
 // Деление полинома a на полином b с остатком. Возвращаемое значение - (частное, остаток)
 div :: (Laurent a) (Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a
 div { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b } =
-        (trim { expon = exp_a - exp_b, coeffs = fst poly_divided }, trim { expon = exp_a, coeffs = snd poly_divided })
+        (trim { expon = exp_a - exp_b, coeffs = reverse (fst poly_divided) }, 
+                        trim { expon = exp_a, coeffs = reverse (snd poly_divided) })
 
     where poly_divided = go (length coeffs_a) (reverse coeffs_a) (length coeffs_b) (reverse coeffs_b)
           go :: Int [a] Int [a] -> ([a], [a]) | fromInt a & / a
@@ -180,6 +181,11 @@ Start =
           (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 0, 1]),
           const (evaluate ((fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [2, 3, 4, 5, 6])) 8),
           const ((evaluate (fromCoeffs [2, 3, 4, 5, 6]) 8) * (evaluate (fromCoeffs [2, 3, 4, 5, 6]) 8))
+        ]++ ["\n\n\n"] ++
+        map toString
+        [
+            zx, rx
         ]
         where a = {expon = 0, coeffs = [1.0, 2.0]}
               b = {expon = 1, coeffs = [1.0, 2.0]}
+              (zx, rx) = div (fromCoeffs [2, 3, 4, 5, 6]) (fromCoeffs [0, 0, 1])
