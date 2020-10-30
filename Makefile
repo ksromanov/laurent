@@ -1,3 +1,2 @@
 laurent: laurent.icl
-	env CLEANLIB=/usr/lib64/clean/exe/ clm -I /usr/lib64/clean/StdEnv/ laurent -o laurent
-#	env CLEANLIB=/usr/lib64/clean/exe/ clm -mv -I /usr/lib64/clean/StdEnv/ laurent -o laurent
+	clm -I /usr/lib64/clean/Platform/ -I /usr/lib64/clean/Gast/ laurent -o laurent

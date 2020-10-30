@@ -3,6 +3,7 @@ module laurent
 import StdEnv
 import StdOverloaded
 import StdMaybe
+import Data.List
 
 // Полином Лорана - минимальная степень expon
 // может быть как больше, так и меньше 0.
@@ -143,12 +144,6 @@ divmod { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b }
                    where quotient = a/b
                          residue` = zipWith (-) a_rest b_rest ++ drop (len_b - 1) [a:a_rest]
                          (quotient_rest, residue) = go (len_a - 1) a_rest len_b [b:b_rest]
-
-// Возможно стоит использовать библиотечную.
-zipWith :: !(a b -> c) ![a] ![b] -> [c]
-zipWith _ [] py = []
-zipWith _ px [] = []
-zipWith op [x:px] [y:py] = [op x y : zipWith op px py]
 
 Start :: [String]
 Start =
