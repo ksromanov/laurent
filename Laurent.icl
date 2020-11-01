@@ -30,8 +30,8 @@ one :: a | fromInt a
 one = fromInt 0
 
 // Вычисление в точке
-evaluate :: (Laurent a) a -> a | fromInt a & +a & *a & /a
-evaluate { expon, coeffs } x = lowest_power * evaluate_poly x coeffs
+evaluateAtPoint :: (Laurent a) a -> a | fromInt a & +a & *a & /a
+evaluateAtPoint { expon, coeffs } x = lowest_power * evaluate_poly x coeffs
     where lowest_power
             | expon > 0 = pow x expon
             | otherwise = pow inv_x (~expon)

@@ -11,7 +11,7 @@ fromCoeffs :: [a] -> Laurent a
 fromShiftCoeffs :: Int [a] -> Laurent a
 
 // Вычисление в точке
-evaluate :: (Laurent a) a -> a | fromInt a & +a & *a & /a
+evaluateAtPoint :: (Laurent a) a -> a | fromInt a & +a & *a & /a
 
 // Селекторы и свойства
 bounds :: (Laurent a) -> (Int, Int)
