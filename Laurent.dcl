@@ -13,6 +13,9 @@ fromShiftCoeffs :: Int [a] -> Laurent a
 // Вычисление в точке
 evaluateAtPoint :: (Laurent a) a -> a | fromInt a & +a & *a & /a
 
+// Стирание лишних нулей с разных сторон
+trim :: (Laurent a) -> (Laurent a) | fromInt a & == a
+
 // Селекторы и свойства
 bounds :: (Laurent a) -> (Int, Int)
 degree :: (Laurent a) -> Int
@@ -26,8 +29,5 @@ instance / (Laurent a) | fromInt a & / a & - a & == a
 
 // Деление с остатком
 divmod :: (Laurent a) (Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a
-
-// Стирание лишних нулей с разных сторон
-trim :: (Laurent a) -> (Laurent a) | fromInt a & == a
 
 instance toString (Laurent a) | toString a & toReal a

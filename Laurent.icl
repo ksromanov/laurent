@@ -43,6 +43,15 @@ evaluateAtPoint { expon, coeffs } x = pow expon * evaluate_poly x coeffs
             where (sum, last) = (foldl (\(sum, x_n) c -> (sum + x_n * c, x_n * x))
                                      (zero, one) coeffs)
 
+// Стирание лишних нулей с разных сторон
+trim :: (Laurent a) -> (Laurent a) | fromInt a & == a
+trim { expon = expon, coeffs = coeffs } =
+    case coeffs`` of
+        [] -> { expon = 0, coeffs = [] }
+        _  -> { expon = expon + length zeroes, coeffs = coeffs`` }
+    where (zeroes, coeffs`) = span ((==) zero) coeffs
+          (coeffs``, _)     = span (\a -> not (a == zero)) coeffs`
+
 // Селекторы и свойства
 // Минимальная и максимальная степени
 bounds :: (Laurent a) -> (Int, Int)
@@ -102,15 +111,6 @@ opShifted op del px py
     where zipWith` _ [] py = map (op zero) py
           zipWith` _ px [] = px
           zipWith` op [x:px] [y:py] = [op x y : zipWith` op px py]
-
-// Стирание лишних нулей с разных сторон
-trim :: (Laurent a) -> (Laurent a) | fromInt a & == a
-trim { expon = expon, coeffs = coeffs } =
-    case coeffs`` of
-        [] -> { expon = 0, coeffs = [] }
-        _  -> { expon = expon + length zeroes, coeffs = coeffs`` }
-    where (zeroes, coeffs`) = span ((==) zero) coeffs
-          (coeffs``, _)     = span (\a -> not (a == zero)) coeffs`
 
 instance == (Laurent a) | fromInt a & == a where
     (==) a b = (a`.expon == b`.expon) && (a`.coeffs == b`.coeffs)
