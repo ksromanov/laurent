@@ -27,22 +27,20 @@ zero :: a | fromInt a
 zero = fromInt 0
 
 one :: a | fromInt a
-one = fromInt 0
+one = fromInt 1
 
 // Вычисление в точке
 evaluateAtPoint :: (Laurent a) a -> a | fromInt a & +a & *a & /a
-evaluateAtPoint { expon, coeffs } x = lowest_power * evaluate_poly x coeffs
-    where lowest_power
-            | expon > 0 = pow x expon
-            | otherwise = pow inv_x (~expon)
+evaluateAtPoint { expon, coeffs } x = pow expon * evaluate_poly x coeffs
+    where pow n
+            | n == 0 = one
+            | n > 0  = x * pow (n - 1)
+            | otherwise = inv_x * pow (n + 1)
 
           inv_x = one / x
 
-          pow x 0 = one
-          pow x n = x * pow x (n - 1)
-
-          evaluate_poly x coeffs = fst
-            (foldl (\(sum, x_n) c -> (sum + x_n * c, x_n * x))
+          evaluate_poly x coeffs = sum
+            where (sum, last) = (foldl (\(sum, x_n) c -> (sum + x_n * c, x_n * x))
                                      (zero, one) coeffs)
 
 // Селекторы и свойства

@@ -3,6 +3,7 @@ module main
 
 import Laurent
 import StdEnv
+import StdOverloaded
 
 import Gast
 
@@ -14,11 +15,32 @@ derive gPrint Laurent
 propertyEq :: (Laurent Int) -> Bool
 propertyEq a = a == a
 
+// Свойства генераторов
+propertyConstEqFromCoeff :: Int -> Bool
+propertyConstEqFromCoeff c = fromConst c == fromCoeffs [c] &&
+                             fromConst c == fromShiftCoeffs 0 [c]
+
+// Вычисление в точке
+propertyEvaluateAtPoint0 :: (Laurent Int) -> Bool
+propertyEvaluateAtPoint0 a
+    | a.expon > 0 && a.expon < 1000 =
+        evaluateAtPoint a 0 == 0
+    | otherwise = True
+
+propertyEvaluateAtPoint1 :: (Laurent Int) -> Bool
+propertyEvaluateAtPoint1 a
+    | a.expon > -1000 && a.expon < 1000 =
+        evaluateAtPoint a 1 == foldl (+) 0 a.coeffs
+    | otherwise = True
+
 propertyMinus :: (Laurent Int) -> Bool
 propertyMinus a = (a - a) == fromConst 0
 
 Start :: [[String]]
 Start = [ test propertyEq
+        , test propertyConstEqFromCoeff
+        , test propertyEvaluateAtPoint0
+        , test propertyEvaluateAtPoint1
         , test propertyMinus]
 /*
         map toString
