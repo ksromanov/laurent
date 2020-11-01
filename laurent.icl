@@ -101,10 +101,9 @@ opShifted op del px py
     | del > 0  = opShifted op (del - 1) [zero:px] py
     | del == 0 = zipWith` op px py
     | del < 0  = opShifted op (del + 1) px [zero:py]
-    where zipWith` _ [] py = map op` py
+    where zipWith` _ [] py = map (op zero) py
           zipWith` _ px [] = px
           zipWith` op [x:px] [y:py] = [op x y : zipWith` op px py]
-          op` x => op zero x
 
 // Стирание лишних нулей с разных сторон
 trim :: (Laurent a) -> (Laurent a) | fromInt a & == a
