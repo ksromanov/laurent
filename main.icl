@@ -14,8 +14,12 @@ derive gPrint Laurent
 propertyEq :: (Laurent Int) -> Bool
 propertyEq a = a == a
 
-Start :: [String]
-Start = test propertyEq
+propertyMinus :: (Laurent Int) -> Bool
+propertyMinus a = (a - a) == fromConst 0
+
+Start :: [[String]]
+Start = [ test propertyEq
+        , test propertyMinus]
 /*
         map toString
         [ trim {expon = -2, coeffs = [0.0, 2.0, 1.0, -0.5, 0.0]},
