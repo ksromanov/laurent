@@ -109,9 +109,16 @@ opShifted op del px py
 // Стирание лишних нулей с разных сторон
 trim :: (Laurent a) -> (Laurent a) | fromInt a & == a
 trim { expon = expon, coeffs = coeffs } =
-            { expon = expon + length zeroes, coeffs = coeffs`` }
+    case coeffs`` of
+        [] -> { expon = 0, coeffs = [] }
+        _  -> { expon = expon + length zeroes, coeffs = coeffs`` }
     where (zeroes, coeffs`) = span ((==) zero) coeffs
           (coeffs``, _)     = span (\a -> not (a == zero)) coeffs`
+
+instance == (Laurent a) | fromInt a & == a where
+    (==) a b = (a`.expon == b`.expon) && (a`.coeffs == b`.coeffs)
+               where a` = trim a
+                     b` = trim b
 
 instance * (Laurent a) | fromInt a & * a & + a where
     (*) { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b } =
