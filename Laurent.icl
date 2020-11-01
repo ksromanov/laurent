@@ -1,5 +1,5 @@
 /* Полиномы Лорана творчески скопированные с numeric-prelude */
-module laurent
+implementation module Laurent
 import StdEnv
 import StdOverloaded
 import StdMaybe
@@ -13,8 +13,8 @@ import Data.List
 :: Laurent a = { expon :: Int, coeffs :: !.[a] }
 
 // Конструкторы (константа, коэффициенты полинома, смещённый полином)
-const :: a -> Laurent a
-const x = fromCoeffs [x]
+fromConst :: a -> Laurent a
+fromConst x = fromCoeffs [x]
 
 fromCoeffs :: [a] -> Laurent a
 fromCoeffs coeffs = fromShiftCoeffs 0 coeffs
@@ -89,7 +89,7 @@ instance + (Laurent a) | fromInt a & + a & == a where
     (+) { expon = a_expon, coeffs = a } { expon = b_expon, coeffs = b } =
         trim { expon = min a_expon b_expon, coeffs = opShifted (+) (a_expon - b_expon) a b}
 
-instance - (Laurent a) | fromInt a &  - a & == a where
+instance - (Laurent a) | fromInt a & - a & == a where
     (-) { expon = a_expon, coeffs = a } { expon = b_expon, coeffs = b } =
         trim { expon = min a_expon b_expon, coeffs = opShifted (-) (a_expon - b_expon) a b}
 
@@ -150,43 +150,3 @@ divmod { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b }
                    where quotient = a/b
                          residue` = zipWith (-) a_rest b_rest ++ drop (len_b - 1) [a:a_rest]
                          (quotient_rest, residue) = go (len_a - 1) a_rest len_b [b:b_rest]
-
-Start :: [String]
-Start =
-        map toString
-        [ trim {expon = -2, coeffs = [0.0, 2.0, 1.0, -0.5, 0.0]},
-          {expon = -3, coeffs = [1.0, 0.0, 2.0, 1.0, 1.0, 0.0, 6.0, ~2.2]},
-          {expon = 0, coeffs = [1.0, 2.0]} + {expon = 1, coeffs = [1.0, 2.0]},
-          {expon = 0, coeffs = [1.0, 2.0]} + {expon = 1, coeffs = [1.0, 2.0]},
-          a * b,
-          const (evaluate a 2.0) + const (evaluate b 2.0),
-          const (evaluate (a + b) 2.0),
-          (const 1.0) * (const 1.0),
-          (const 3.0) * (const 2.0),
-          const (evaluate a 2.0) * const (evaluate b 2.0),
-          const (evaluate (a * b) 2.0)
-        ] ++ ["\n\n\n"] ++
-        map toString
-        [
-          (const 1) * (const 1),
-          (const 3) * (const 2),
-          (fromCoeffs [2, 3, 4, 5, 6]) * (const 2),
-          (const 2) * (fromCoeffs [2, 3, 4, 5, 6]),
-          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 1])
-        ] ++ ["\n\n\n"] ++
-        map toString
-        [
-          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [1, 0, 0]),
-          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 1, 0]),
-          (fromCoeffs [0, 1, 0]) * (fromCoeffs [2, 3, 4, 5, 6]),
-          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 0, 1]),
-          const (evaluate ((fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [2, 3, 4, 5, 6])) 8),
-          const ((evaluate (fromCoeffs [2, 3, 4, 5, 6]) 8) * (evaluate (fromCoeffs [2, 3, 4, 5, 6]) 8))
-        ]++ ["\n\n\n"] ++
-        map toString
-        [
-            zx, rx
-        ]
-        where a = {expon = 0, coeffs = [1.0, 2.0]}
-              b = {expon = 1, coeffs = [1.0, 2.0]}
-              (zx, rx) = divmod (fromCoeffs [2, 3, 4, 5, 6]) (fromCoeffs [0, 0, 1])
