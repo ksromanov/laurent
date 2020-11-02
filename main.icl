@@ -10,9 +10,15 @@ import Gast
 import StdDebug
 
 derive bimap []
-derive ggen Laurent
 derive genShow Laurent
 derive gPrint Laurent
+
+// Limit number of powers to the range [-100, 100]
+ggen{|Laurent|} a state =
+    map (\(expon, coeffs) -> {expon = expon, coeffs = coeffs})
+        (diag2 expon coeffs)
+    where coeffs = [[x \\ x <- xs] \\ xs <- ggen{|*->*|} a state]
+          expon = [~100..100]
 
 propertyEq :: (Laurent Int) -> Bool
 propertyEq a = a == a
@@ -58,7 +64,6 @@ propertyDoubleTrim a = trim (trim a) == trim a
 propertyTrimEvaluate :: (Laurent Int) Int -> Bool
 propertyTrimEvaluate a x
     | x == 0 && a.expon < 0 = True
-    | a.expon < -100 || a.expon > 100 = True // FIXME - убрать после создания генератора
     | otherwise = evaluateAtPoint a x == evaluateAtPoint a x
 
 propertyMinus :: (Laurent Int) -> Bool
