@@ -44,6 +44,23 @@ propertyEvaluateMonomial n c x
     | otherwise = True // отсекаем NaN и прочие глупости
     where expon = (n rem 200) - 100
 
+// Проверка trim
+propertyTrimNoZeroes :: (Laurent Int) -> Bool
+propertyTrimNoZeroes a
+    | a`.coeffs == [] = True
+    | otherwise =
+        hd a`.coeffs <> 0 && hd (reverse a`.coeffs) <> 0
+    where a` = trim a
+
+propertyDoubleTrim :: (Laurent Int) -> Bool
+propertyDoubleTrim a = trim (trim a) == trim a
+
+propertyTrimEvaluate :: (Laurent Int) Int -> Bool
+propertyTrimEvaluate a x
+    | x == 0 && a.expon < 0 = True
+    | a.expon < -100 || a.expon > 100 = True // FIXME - убрать после создания генератора
+    | otherwise = evaluateAtPoint a x == evaluateAtPoint a x
+
 propertyMinus :: (Laurent Int) -> Bool
 propertyMinus a = (a - a) == fromConst 0
 
@@ -53,6 +70,9 @@ Start = [ test propertyEq
         , test propertyEvaluateAtPoint0
         , test propertyEvaluateAtPoint1
         , test propertyEvaluateMonomial
+        , test propertyTrimNoZeroes
+        , test propertyDoubleTrim
+        , test propertyTrimEvaluate
         , test propertyMinus]
 /*
         map toString
