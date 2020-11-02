@@ -7,6 +7,8 @@ import StdOverloaded
 
 import Gast
 
+import StdDebug
+
 derive bimap []
 derive ggen Laurent
 derive genShow Laurent
@@ -23,6 +25,8 @@ propertyConstEqFromCoeff c = fromConst c == fromCoeffs [c] &&
 // Вычисление в точке
 propertyEvaluateAtPoint0 :: (Laurent Int) -> Bool
 propertyEvaluateAtPoint0 a
+    | a.expon == 0 && a.coeffs <> [] =
+        evaluateAtPoint a 0 == hd a.coeffs
     | a.expon > 0 && a.expon < 1000 =
         evaluateAtPoint a 0 == 0
     | otherwise = True
@@ -33,6 +37,13 @@ propertyEvaluateAtPoint1 a
         evaluateAtPoint a 1 == foldl (+) 0 a.coeffs
     | otherwise = True
 
+propertyEvaluateMonomial :: Int Real Real -> Bool
+propertyEvaluateMonomial n c x
+    | expon <= 0 && x == 0.0 = True
+    | isFinite x && isFinite c = evaluateAtPoint { expon = expon, coeffs = [c] } x == c * x^(fromInt expon)
+    | otherwise = True // отсекаем NaN и прочие глупости
+    where expon = (n rem 200) - 100
+
 propertyMinus :: (Laurent Int) -> Bool
 propertyMinus a = (a - a) == fromConst 0
 
@@ -41,6 +52,7 @@ Start = [ test propertyEq
         , test propertyConstEqFromCoeff
         , test propertyEvaluateAtPoint0
         , test propertyEvaluateAtPoint1
+        , test propertyEvaluateMonomial
         , test propertyMinus]
 /*
         map toString
