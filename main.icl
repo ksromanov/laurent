@@ -90,7 +90,7 @@ propertyPlusEvalGF2 :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
 propertyPlusEvalGF2 a b x
     | (a.expon < 0 || b.expon < 0) && x == zero = True
     | otherwise =
-        evaluateAtPoint a x + evaluateAtPoint b x == evaluateAtPoint (a - b) x
+        evaluateAtPoint a x + evaluateAtPoint b x == evaluateAtPoint (a + b) x
 
 propertyMultiplyEvalGF2 :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
 propertyMultiplyEvalGF2 a b x
@@ -108,7 +108,7 @@ propertyPlusEvalGF3 :: (Laurent FieldGF3) (Laurent FieldGF3) FieldGF3 -> Bool
 propertyPlusEvalGF3 a b x
     | (a.expon < 0 || b.expon < 0) && x == zero = True
     | otherwise =
-        evaluateAtPoint a x + evaluateAtPoint b x == evaluateAtPoint (a - b) x
+        evaluateAtPoint a x + evaluateAtPoint b x == evaluateAtPoint (a + b) x
 
 propertyMultiplyEvalGF3 :: (Laurent FieldGF3) (Laurent FieldGF3) FieldGF3 -> Bool
 propertyMultiplyEvalGF3 a b x
