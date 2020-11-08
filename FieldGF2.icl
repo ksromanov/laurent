@@ -5,6 +5,8 @@ import StdInt
 import StdMisc
 import StdOverloaded
 
+import Gast
+
 :: FieldGF2 = FieldGF2 Bool
 
 instance == FieldGF2 where
@@ -23,5 +25,19 @@ instance / FieldGF2 where
     (/) a (FieldGF2  True) = a
     (/) a (FieldGF2 False) = abort "division by 0"
 
+instance ~ FieldGF2 where
+    ~ a = a
+
 instance fromInt FieldGF2 where
     fromInt i = FieldGF2 (not (i == 0))
+
+instance toReal FieldGF2 where
+    toReal (FieldGF2  True) = 1.0
+    toReal (FieldGF2 False) = 0.0
+
+instance toString FieldGF2 where
+    toString (FieldGF2  True) = "1"
+    toString (FieldGF2 False) = "0"
+
+derive bimap []
+derive ggen FieldGF2

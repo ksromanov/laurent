@@ -142,7 +142,6 @@ propertyGF2Div a b
     | b == zero = True
     | otherwise = (a / b) * b == a
 
-derive ggen FieldGF2
 derive genShow FieldGF2
 derive gPrint FieldGF2
 
