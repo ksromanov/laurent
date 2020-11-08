@@ -84,6 +84,12 @@ propertyPlusEval a b x
     | otherwise =
         evaluateAtPoint a x + evaluateAtPoint b x == evaluateAtPoint (a - b) x
 
+propertyMultiplyEval :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
+propertyMultiplyEval a b x
+    | (a.expon < 0 || b.expon < 0) && x == FieldGF2 False = True
+    | otherwise =
+        evaluateAtPoint a x * evaluateAtPoint b x == evaluateAtPoint (a * b) x
+
 print a = "[" +++ toString a.expon +++ ": "
     +++ foldl (+++) "" (map (\x -> " " +++ toString x) a.coeffs)
     +++ "]"
@@ -121,4 +127,5 @@ Start = [ test propertyGF2PlusMinus
         , test propertyTrimEvaluate
         , test propertyMinus
         , test propertyMinusEval
-        , test propertyPlusEval]
+        , test propertyPlusEval
+        , test propertyMultiplyEval]

@@ -118,6 +118,8 @@ instance == (Laurent a) | fromInt a & == a where
                      b` = trim b
 
 instance * (Laurent a) | fromInt a & * a & + a where
+    (*) { expon = _ , coeffs = [] } _ = { expon = 0 , coeffs = [] }
+    (*) _ { expon = _ , coeffs = [] } = { expon = 0 , coeffs = [] }
     (*) { expon = exp_a, coeffs = coeffs_a } { expon = exp_b, coeffs = coeffs_b } =
                                             { expon = exp_a + exp_b, coeffs = go coeffs_a [] coeffs_b }
 
