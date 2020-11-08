@@ -16,6 +16,13 @@ derive bimap []
 derive genShow Laurent
 derive gPrint Laurent
 
+// Вспомогательные значения a
+zero :: a | fromInt a
+zero = fromInt 0
+
+one :: a | fromInt a
+one = fromInt 1
+
 // Limit number of powers to the range [-100, 100]
 // Этот генератор ужасно работает с Real
 ggen{|Laurent|} a state =
@@ -76,36 +83,36 @@ propertyMinus a = (a - a) == fromConst 0
 
 propertyMinusEvalGF2 :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
 propertyMinusEvalGF2 a b x
-    | (a.expon < 0 || b.expon < 0) && x == FieldGF2 False = True
+    | (a.expon < 0 || b.expon < 0) && x == zero = True
     | otherwise = evaluateAtPoint a x - evaluateAtPoint b x == evaluateAtPoint (a - b) x
 
 propertyPlusEvalGF2 :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
 propertyPlusEvalGF2 a b x
-    | (a.expon < 0 || b.expon < 0) && x == FieldGF2 False = True
+    | (a.expon < 0 || b.expon < 0) && x == zero = True
     | otherwise =
         evaluateAtPoint a x + evaluateAtPoint b x == evaluateAtPoint (a - b) x
 
 propertyMultiplyEvalGF2 :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
 propertyMultiplyEvalGF2 a b x
-    | (a.expon < 0 || b.expon < 0) && x == FieldGF2 False = True
+    | (a.expon < 0 || b.expon < 0) && x == zero = True
     | otherwise =
         evaluateAtPoint a x * evaluateAtPoint b x == evaluateAtPoint (a * b) x
 
 // Проверка сложения и вычитания на поле GF3
 propertyMinusEvalGF3 :: (Laurent FieldGF3) (Laurent FieldGF3) FieldGF3 -> Bool
 propertyMinusEvalGF3 a b x
-    | (a.expon < 0 || b.expon < 0) && x == FieldGF3 0 = True
+    | (a.expon < 0 || b.expon < 0) && x == zero = True
     | otherwise = evaluateAtPoint a x - evaluateAtPoint b x == evaluateAtPoint (a - b) x
 
 propertyPlusEvalGF3 :: (Laurent FieldGF3) (Laurent FieldGF3) FieldGF3 -> Bool
 propertyPlusEvalGF3 a b x
-    | (a.expon < 0 || b.expon < 0) && x == FieldGF3 0 = True
+    | (a.expon < 0 || b.expon < 0) && x == zero = True
     | otherwise =
         evaluateAtPoint a x + evaluateAtPoint b x == evaluateAtPoint (a - b) x
 
 propertyMultiplyEvalGF3 :: (Laurent FieldGF3) (Laurent FieldGF3) FieldGF3 -> Bool
 propertyMultiplyEvalGF3 a b x
-    | (a.expon < 0 || b.expon < 0) && x == FieldGF3 0 = True
+    | (a.expon < 0 || b.expon < 0) && x == zero = True
     | otherwise =
         evaluateAtPoint a x * evaluateAtPoint b x == evaluateAtPoint (a * b) x
 
@@ -117,14 +124,22 @@ propertyGF2PlusMinus :: FieldGF2 FieldGF2 -> Bool
 propertyGF2PlusMinus a b =
        a + b == b + a
     && a + b - b == a
+    && a + zero == a
 
 propertyGF2Mult :: FieldGF2 FieldGF2 -> Bool
 propertyGF2Mult a b =
-    a * b == b * a
+       a * b == b * a
+    && a * zero == zero
+    && a * one == a
+
+propertyGF2Mult01 :: FieldGF2 -> Bool
+propertyGF2Mult01 a =
+       a * zero == zero
+    && a * one == a
 
 propertyGF2Div :: FieldGF2 FieldGF2 -> Bool
 propertyGF2Div a b
-    | b == (FieldGF2 False) = True
+    | b == zero = True
     | otherwise = (a / b) * b == a
 
 derive ggen FieldGF2
@@ -142,21 +157,22 @@ propertyGF3PlusMinus a b =
 
 propertyGF3Mult :: FieldGF3 FieldGF3 -> Bool
 propertyGF3Mult a b =
-    a * b == b * a
+       a * b == b * a
 
 propertyGF3Mult01 :: FieldGF3 FieldGF3 -> Bool
 propertyGF3Mult01 a b =
-       a * (FieldGF3 0) == (FieldGF3 0)
-    && a * (FieldGF3 1) == a
+       a * zero == zero
+    && a * one  == a
 
 propertyGF3Div :: FieldGF3 FieldGF3 -> Bool
 propertyGF3Div a b
-    | b == (FieldGF3 0) = True
+    | b == zero = True
     | otherwise = (a / b) * b == a
 
 Start :: [[String]]
 Start = [ test propertyGF2PlusMinus
         , test propertyGF2Mult
+        , test propertyGF2Mult01
         , test propertyGF2Div
         , test propertyGF3PlusMinus
         , test propertyGF3Mult
