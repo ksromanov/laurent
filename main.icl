@@ -9,16 +9,19 @@ import Gast
 
 import StdDebug
 
+import FieldGF2
+
 derive bimap []
 derive genShow Laurent
 derive gPrint Laurent
 
 // Limit number of powers to the range [-100, 100]
+// Этот генератор ужасно работает с Real
 ggen{|Laurent|} a state =
     map (\(expon, coeffs) -> {expon = expon, coeffs = coeffs})
         (diag2 expon coeffs)
-    where coeffs = [[x \\ x <- xs] \\ xs <- ggen{|*->*|} a state]
-          expon = [~100..100]
+    where coeffs = ggen{|*->*|} a state
+          expon = [~5..5]
 
 propertyEq :: (Laurent Int) -> Bool
 propertyEq a = a == a
@@ -66,11 +69,49 @@ propertyTrimEvaluate a x
     | x == 0 && a.expon < 0 = True
     | otherwise = evaluateAtPoint a x == evaluateAtPoint a x
 
+// Проверка сложения и вычитания
 propertyMinus :: (Laurent Int) -> Bool
 propertyMinus a = (a - a) == fromConst 0
 
+propertyMinusEval :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
+propertyMinusEval a b x
+    | (a.expon < 0 || b.expon < 0) && x == FieldGF2 False = True
+    | otherwise = evaluateAtPoint a x - evaluateAtPoint b x == evaluateAtPoint (a - b) x
+
+propertyPlusEval :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
+propertyPlusEval a b x
+    | (a.expon < 0 || b.expon < 0) && x == FieldGF2 False = True
+    | otherwise =
+        evaluateAtPoint a x + evaluateAtPoint b x == evaluateAtPoint (a - b) x
+
+print a = "[" +++ toString a.expon +++ ": "
+    +++ foldl (+++) "" (map (\x -> " " +++ toString x) a.coeffs)
+    +++ "]"
+
+propertyGF2PlusMinus :: FieldGF2 FieldGF2 -> Bool
+propertyGF2PlusMinus a b =
+       a + b == b + a
+    && a + b - b == a 
+    && a + b == b + a
+
+propertyGF2Mult :: FieldGF2 FieldGF2 -> Bool
+propertyGF2Mult a b =
+    a * b == b * a
+
+propertyGF2Div :: FieldGF2 FieldGF2 -> Bool
+propertyGF2Div a b
+    | b == (FieldGF2 False) = True
+    | otherwise = (a / b) * b == a
+
+derive ggen FieldGF2
+derive genShow FieldGF2
+derive gPrint FieldGF2
+
 Start :: [[String]]
-Start = [ test propertyEq
+Start = [ test propertyGF2PlusMinus
+        , test propertyGF2Mult
+        , test propertyGF2Div
+        , test propertyEq
         , test propertyConstEqFromCoeff
         , test propertyEvaluateAtPoint0
         , test propertyEvaluateAtPoint1
@@ -78,43 +119,6 @@ Start = [ test propertyEq
         , test propertyTrimNoZeroes
         , test propertyDoubleTrim
         , test propertyTrimEvaluate
-        , test propertyMinus]
-/*
-        map toString
-        [ trim {expon = -2, coeffs = [0.0, 2.0, 1.0, -0.5, 0.0]},
-          {expon = -3, coeffs = [1.0, 0.0, 2.0, 1.0, 1.0, 0.0, 6.0, ~2.2]},
-          {expon = 0, coeffs = [1.0, 2.0]} + {expon = 1, coeffs = [1.0, 2.0]},
-          {expon = 0, coeffs = [1.0, 2.0]} + {expon = 1, coeffs = [1.0, 2.0]},
-          a * b,
-          fromConst (evaluateAtPoint a 2.0) + fromConst (evaluateAtPoint b 2.0),
-          fromConst (evaluateAtPoint (a + b) 2.0),
-          (fromConst 1.0) * (fromConst 1.0),
-          (fromConst 3.0) * (fromConst 2.0),
-          fromConst (evaluateAtPoint a 2.0) * fromConst (evaluateAtPoint b 2.0),
-          fromConst (evaluateAtPoint (a * b) 2.0)
-        ] ++ ["\n\n\n"] ++
-        map toString
-        [
-          (fromConst 1) * (fromConst 1),
-          (fromConst 3) * (fromConst 2),
-          (fromCoeffs [2, 3, 4, 5, 6]) * (fromConst 2),
-          (fromConst 2) * (fromCoeffs [2, 3, 4, 5, 6]),
-          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 1])
-        ] ++ ["\n\n\n"] ++
-        map toString
-        [
-          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [1, 0, 0]),
-          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 1, 0]),
-          (fromCoeffs [0, 1, 0]) * (fromCoeffs [2, 3, 4, 5, 6]),
-          (fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [0, 0, 1]),
-          fromConst (evaluateAtPoint ((fromCoeffs [2, 3, 4, 5, 6]) * (fromCoeffs [2, 3, 4, 5, 6])) 8),
-          fromConst ((evaluateAtPoint (fromCoeffs [2, 3, 4, 5, 6]) 8) * (evaluateAtPoint (fromCoeffs [2, 3, 4, 5, 6]) 8))
-        ]++ ["\n\n\n"] ++
-        map toString
-        [
-            zx, rx
-        ]
-        where a = {expon = 0, coeffs = [1.0, 2.0]}
-              b = {expon = 1, coeffs = [1.0, 2.0]}
-              (zx, rx) = divmod (fromCoeffs [2, 3, 4, 5, 6]) (fromCoeffs [0, 0, 1])
-*/
+        , test propertyMinus
+        , test propertyMinusEval
+        , test propertyPlusEval]
