@@ -10,6 +10,7 @@ import Gast
 import StdDebug
 
 import FieldGF2
+import FieldGF3
 
 derive bimap []
 derive genShow Laurent
@@ -73,20 +74,38 @@ propertyTrimEvaluate a x
 propertyMinus :: (Laurent Int) -> Bool
 propertyMinus a = (a - a) == fromConst 0
 
-propertyMinusEval :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
-propertyMinusEval a b x
+propertyMinusEvalGF2 :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
+propertyMinusEvalGF2 a b x
     | (a.expon < 0 || b.expon < 0) && x == FieldGF2 False = True
     | otherwise = evaluateAtPoint a x - evaluateAtPoint b x == evaluateAtPoint (a - b) x
 
-propertyPlusEval :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
-propertyPlusEval a b x
+propertyPlusEvalGF2 :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
+propertyPlusEvalGF2 a b x
     | (a.expon < 0 || b.expon < 0) && x == FieldGF2 False = True
     | otherwise =
         evaluateAtPoint a x + evaluateAtPoint b x == evaluateAtPoint (a - b) x
 
-propertyMultiplyEval :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
-propertyMultiplyEval a b x
+propertyMultiplyEvalGF2 :: (Laurent FieldGF2) (Laurent FieldGF2) FieldGF2 -> Bool
+propertyMultiplyEvalGF2 a b x
     | (a.expon < 0 || b.expon < 0) && x == FieldGF2 False = True
+    | otherwise =
+        evaluateAtPoint a x * evaluateAtPoint b x == evaluateAtPoint (a * b) x
+
+// Проверка сложения и вычитания на поле GF3
+propertyMinusEvalGF3 :: (Laurent FieldGF3) (Laurent FieldGF3) FieldGF3 -> Bool
+propertyMinusEvalGF3 a b x
+    | (a.expon < 0 || b.expon < 0) && x == FieldGF3 0 = True
+    | otherwise = evaluateAtPoint a x - evaluateAtPoint b x == evaluateAtPoint (a - b) x
+
+propertyPlusEvalGF3 :: (Laurent FieldGF3) (Laurent FieldGF3) FieldGF3 -> Bool
+propertyPlusEvalGF3 a b x
+    | (a.expon < 0 || b.expon < 0) && x == FieldGF3 0 = True
+    | otherwise =
+        evaluateAtPoint a x + evaluateAtPoint b x == evaluateAtPoint (a - b) x
+
+propertyMultiplyEvalGF3 :: (Laurent FieldGF3) (Laurent FieldGF3) FieldGF3 -> Bool
+propertyMultiplyEvalGF3 a b x
+    | (a.expon < 0 || b.expon < 0) && x == FieldGF3 0 = True
     | otherwise =
         evaluateAtPoint a x * evaluateAtPoint b x == evaluateAtPoint (a * b) x
 
@@ -97,8 +116,7 @@ print a = "[" +++ toString a.expon +++ ": "
 propertyGF2PlusMinus :: FieldGF2 FieldGF2 -> Bool
 propertyGF2PlusMinus a b =
        a + b == b + a
-    && a + b - b == a 
-    && a + b == b + a
+    && a + b - b == a
 
 propertyGF2Mult :: FieldGF2 FieldGF2 -> Bool
 propertyGF2Mult a b =
@@ -113,10 +131,37 @@ derive ggen FieldGF2
 derive genShow FieldGF2
 derive gPrint FieldGF2
 
+derive genShow FieldGF3
+derive gPrint FieldGF3
+
+propertyGF3PlusMinus :: FieldGF3 FieldGF3 -> Bool
+propertyGF3PlusMinus a b =
+       a + b == b + a
+    && a + b - b == a
+    && a - b == ~(b - a)
+
+propertyGF3Mult :: FieldGF3 FieldGF3 -> Bool
+propertyGF3Mult a b =
+    a * b == b * a
+
+propertyGF3Mult01 :: FieldGF3 FieldGF3 -> Bool
+propertyGF3Mult01 a b =
+       a * (FieldGF3 0) == (FieldGF3 0)
+    && a * (FieldGF3 1) == a
+
+propertyGF3Div :: FieldGF3 FieldGF3 -> Bool
+propertyGF3Div a b
+    | b == (FieldGF3 0) = True
+    | otherwise = (a / b) * b == a
+
 Start :: [[String]]
 Start = [ test propertyGF2PlusMinus
         , test propertyGF2Mult
         , test propertyGF2Div
+        , test propertyGF3PlusMinus
+        , test propertyGF3Mult
+        , test propertyGF3Mult01
+        , test propertyGF3Div
         , test propertyEq
         , test propertyConstEqFromCoeff
         , test propertyEvaluateAtPoint0
@@ -126,6 +171,9 @@ Start = [ test propertyGF2PlusMinus
         , test propertyDoubleTrim
         , test propertyTrimEvaluate
         , test propertyMinus
-        , test propertyMinusEval
-        , test propertyPlusEval
-        , test propertyMultiplyEval]
+        , test propertyMinusEvalGF2
+        , test propertyPlusEvalGF2
+        , test propertyMultiplyEvalGF2
+        , test propertyMinusEvalGF3
+        , test propertyPlusEvalGF3
+        , test propertyMultiplyEvalGF3]
