@@ -55,12 +55,24 @@ propertyEvaluateAtPoint1 a
         evaluateAtPoint a 1 == foldl (+) 0 a.coeffs
     | otherwise = True
 
+// Fuzzy equality
+(~=~) infix 4 :: Real Real -> Bool
+(~=~) a b
+    | isNaN a && isNaN b = True
+    | isInfinity a && isInfinity b
+        | a > 0.0 && b > 0.0 = True
+        | a < 0.0 && b < 0.0 = True
+        | otherwise = False
+    | abs( 0.5 * a + 0.5 * b)*10E-8 >= abs( a - b) = True
+    | otherwise = False
+
 propertyEvaluateMonomial :: Int Real Real -> Bool
 propertyEvaluateMonomial n c x
-    | expon <= 0 && x == 0.0 = True
-    | isFinite x && isFinite c = evaluateAtPoint { expon = expon, coeffs = [c] } x == c * x^(fromInt expon)
+    | expon <= 0 && abs x < 1.0E-40 = True
+    | isFinite x && isFinite c =
+        evaluateAtPoint { expon = expon, coeffs = [c] } x ~=~ c * x^(fromInt expon)
     | otherwise = True // отсекаем NaN и прочие глупости
-    where expon = (n rem 200) - 100
+    where expon = (n rem 20) - 10
 
 // Проверка trim
 propertyTrimNoZeroes :: (Laurent Int) -> Bool
@@ -211,25 +223,7 @@ propertyGF127Div a b
     | otherwise = (a / b) * b == a
 
 Start :: [[String]]
-Start = //gfFieldsTests ++
-        [ test propertyEq
-        , test propertyConstEqFromCoeff
-        , test propertyEvaluateAtPoint0
-        , test propertyEvaluateAtPoint1
-        , test propertyEvaluateMonomial
-        , test propertyTrimNoZeroes
-        , test propertyDoubleTrim
-        , test propertyTrimEvaluate
-        , test propertyMinus
-        , test propertyMinusEvalGF2
-        , test propertyPlusEvalGF2
-        , test propertyMultiplyEvalGF2
-        , test propertyMinusEvalGF3
-        , test propertyPlusEvalGF3
-        , test propertyMultiplyEvalGF3
-        , testn 20000 propertyMinusEvalGF127
-        , testn 20000 propertyPlusEvalGF127
-        , testn 20000 propertyMultiplyEvalGF127]
+Start = laurentTests //++ gfFieldsTests
     where gfFieldsTests = [ test propertyGF2PlusMinus
                           , test propertyGF2Mult
                           , test propertyGF2Mult01
@@ -242,3 +236,23 @@ Start = //gfFieldsTests ++
                           , testn 20000 propertyGF127Mult
                           , test propertyGF127Mult01
                           , testn 20000 propertyGF127Div]
+          laurentTests = [ test propertyEq
+                         , test propertyConstEqFromCoeff
+                         , test propertyEvaluateAtPoint0
+                         , test propertyEvaluateAtPoint1
+                         , test propertyEvaluateMonomial
+                         , test propertyTrimNoZeroes
+                         , test propertyDoubleTrim
+                         , test propertyTrimEvaluate
+                         , test propertyMinus
+                         , test propertyMinusEvalGF2
+                         , test propertyPlusEvalGF2
+                         , test propertyMultiplyEvalGF2
+                         , test propertyMinusEvalGF3
+                         , test propertyPlusEvalGF3
+                         , test propertyMultiplyEvalGF3
+                         , testn 20000 propertyMinusEvalGF127
+                         , testn 20000 propertyPlusEvalGF127
+                         , testn 20000 propertyMultiplyEvalGF127]
+
+          test x = testn 20000 x
