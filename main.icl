@@ -11,6 +11,7 @@ import StdDebug
 
 import FieldGF2
 import FieldGF3
+import FieldGF127
 
 derive bimap []
 derive genShow Laurent
@@ -116,6 +117,24 @@ propertyMultiplyEvalGF3 a b x
     | otherwise =
         evaluateAtPoint a x * evaluateAtPoint b x == evaluateAtPoint (a * b) x
 
+// Проверка сложения и вычитания на поле GF127
+propertyMinusEvalGF127 :: (Laurent FieldGF127) (Laurent FieldGF127) FieldGF127 -> Bool
+propertyMinusEvalGF127 a b x
+    | (a.expon < 0 || b.expon < 0) && x == zero = True
+    | otherwise = evaluateAtPoint a x - evaluateAtPoint b x == evaluateAtPoint (a - b) x
+
+propertyPlusEvalGF127 :: (Laurent FieldGF127) (Laurent FieldGF127) FieldGF127 -> Bool
+propertyPlusEvalGF127 a b x
+    | (a.expon < 0 || b.expon < 0) && x == zero = True
+    | otherwise =
+        evaluateAtPoint a x + evaluateAtPoint b x == evaluateAtPoint (a + b) x
+
+propertyMultiplyEvalGF127 :: (Laurent FieldGF127) (Laurent FieldGF127) FieldGF127 -> Bool
+propertyMultiplyEvalGF127 a b x
+    | (a.expon < 0 || b.expon < 0) && x == zero = True
+    | otherwise =
+        evaluateAtPoint a x * evaluateAtPoint b x == evaluateAtPoint (a * b) x
+
 print a = "[" +++ toString a.expon +++ ": "
     +++ foldl (+++) "" (map (\x -> " " +++ toString x) a.coeffs)
     +++ "]"
@@ -148,6 +167,9 @@ derive gPrint FieldGF2
 derive genShow FieldGF3
 derive gPrint FieldGF3
 
+derive genShow FieldGF127
+derive gPrint FieldGF127
+
 propertyGF3PlusMinus :: FieldGF3 FieldGF3 -> Bool
 propertyGF3PlusMinus a b =
        a + b == b + a
@@ -158,13 +180,33 @@ propertyGF3Mult :: FieldGF3 FieldGF3 -> Bool
 propertyGF3Mult a b =
        a * b == b * a
 
-propertyGF3Mult01 :: FieldGF3 FieldGF3 -> Bool
-propertyGF3Mult01 a b =
+propertyGF3Mult01 :: FieldGF3 -> Bool
+propertyGF3Mult01 a =
        a * zero == zero
     && a * one  == a
 
 propertyGF3Div :: FieldGF3 FieldGF3 -> Bool
 propertyGF3Div a b
+    | b == zero = True
+    | otherwise = (a / b) * b == a
+
+propertyGF127PlusMinus :: FieldGF127 FieldGF127 -> Bool
+propertyGF127PlusMinus a b =
+       a + b == b + a
+    && a + b - b == a
+    && a - b == ~(b - a)
+
+propertyGF127Mult :: FieldGF127 FieldGF127 -> Bool
+propertyGF127Mult a b =
+       a * b == b * a
+
+propertyGF127Mult01 :: FieldGF127 -> Bool
+propertyGF127Mult01 a =
+       a * zero == zero
+    && a * one  == a
+
+propertyGF127Div :: FieldGF127 FieldGF127 -> Bool
+propertyGF127Div a b
     | b == zero = True
     | otherwise = (a / b) * b == a
 
@@ -177,6 +219,10 @@ Start = [ test propertyGF2PlusMinus
         , test propertyGF3Mult
         , test propertyGF3Mult01
         , test propertyGF3Div
+        , testn 20000 propertyGF127PlusMinus
+        , testn 20000 propertyGF127Mult
+        , test propertyGF127Mult01
+        , testn 20000 propertyGF127Div
         , test propertyEq
         , test propertyConstEqFromCoeff
         , test propertyEvaluateAtPoint0
@@ -191,4 +237,7 @@ Start = [ test propertyGF2PlusMinus
         , test propertyMultiplyEvalGF2
         , test propertyMinusEvalGF3
         , test propertyPlusEvalGF3
-        , test propertyMultiplyEvalGF3]
+        , test propertyMultiplyEvalGF3
+        , testn 20000 propertyMinusEvalGF127
+        , testn 20000 propertyPlusEvalGF127
+        , testn 20000 propertyMultiplyEvalGF127]
