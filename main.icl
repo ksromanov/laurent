@@ -211,19 +211,8 @@ propertyGF127Div a b
     | otherwise = (a / b) * b == a
 
 Start :: [[String]]
-Start = [ test propertyGF2PlusMinus
-        , test propertyGF2Mult
-        , test propertyGF2Mult01
-        , test propertyGF2Div
-        , test propertyGF3PlusMinus
-        , test propertyGF3Mult
-        , test propertyGF3Mult01
-        , test propertyGF3Div
-        , testn 20000 propertyGF127PlusMinus
-        , testn 20000 propertyGF127Mult
-        , test propertyGF127Mult01
-        , testn 20000 propertyGF127Div
-        , test propertyEq
+Start = //gfFieldsTests ++
+        [ test propertyEq
         , test propertyConstEqFromCoeff
         , test propertyEvaluateAtPoint0
         , test propertyEvaluateAtPoint1
@@ -241,3 +230,15 @@ Start = [ test propertyGF2PlusMinus
         , testn 20000 propertyMinusEvalGF127
         , testn 20000 propertyPlusEvalGF127
         , testn 20000 propertyMultiplyEvalGF127]
+    where gfFieldsTests = [ test propertyGF2PlusMinus
+                          , test propertyGF2Mult
+                          , test propertyGF2Mult01
+                          , test propertyGF2Div
+                          , test propertyGF3PlusMinus
+                          , test propertyGF3Mult
+                          , test propertyGF3Mult01
+                          , test propertyGF3Div
+                          , testn 20000 propertyGF127PlusMinus
+                          , testn 20000 propertyGF127Mult
+                          , test propertyGF127Mult01
+                          , testn 20000 propertyGF127Div]
