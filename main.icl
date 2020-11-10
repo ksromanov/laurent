@@ -90,6 +90,11 @@ propertyTrimEvaluateAt1 a
     | a.expon < -1000 || a.expon > 1000 = True
     | otherwise = evaluateAtPoint (trim a) 1 == evaluateAtPoint a 1
 
+propertyTrimEvaluateGF3 :: (Laurent FieldGF3) FieldGF3 -> Bool
+propertyTrimEvaluateGF3 a x
+    | a.expon < 0 && x == zero = True
+    | otherwise = evaluateAtPoint (trim a) x == evaluateAtPoint a x
+
 // Проверка сложения и вычитания
 propertyMinus :: (Laurent Int) -> Bool
 propertyMinus a = (a - a) == fromConst 0
@@ -244,6 +249,7 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyTrimNoZeroes
                          , test propertyDoubleTrim
                          , test propertyTrimEvaluateAt1
+                         , test propertyTrimEvaluateGF3
                          , test propertyMinus
                          , test propertyMinusEvalGF2
                          , test propertyPlusEvalGF2
