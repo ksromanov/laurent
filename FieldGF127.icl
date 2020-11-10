@@ -30,15 +30,17 @@ instance - FieldGF127 where
 instance * FieldGF127 where
     (*) (FieldGF127 a) (FieldGF127 b) = FieldGF127 ((a * b) rem 127)
 
+inverses :: {#Int}
+inverses =: { find_inverse 0 x \\ x <- [0..126] }
+    where find_inverse inv x
+          | x == 0 = 0 // dummy value
+          | (((inv * x) rem 127) + 127) rem 127 == 1 = inv
+          | otherwise = find_inverse (inv + 1) x
+
+
 inverse :: FieldGF127 -> FieldGF127
-inverse a = /*trace(foldl (+++) "" (map (\i -> "  " +++ toString i) [x \\ x <-: inverses])) */ FieldGF127 inverses.[a`]
+inverse a = FieldGF127 inverses.[a`]
     where (FieldGF127 a`) = normalize a   
-          inverses :: {#Int}
-          inverses = { find_inverse 0 x \\ x <- [0..126] }
-          find_inverse inv x
-            | x == 0 = 0 // dummy value
-            | (((inv * x) rem 127) + 127) rem 127 == 1 = inv
-            | otherwise = find_inverse (inv + 1) x
 
 instance / FieldGF127 where
     (/) _ (FieldGF127 0) = abort "division by 0"
