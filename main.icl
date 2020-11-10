@@ -85,10 +85,10 @@ propertyTrimNoZeroes a
 propertyDoubleTrim :: (Laurent Int) -> Bool
 propertyDoubleTrim a = trim (trim a) == trim a
 
-propertyTrimEvaluate :: (Laurent Int) Int -> Bool
-propertyTrimEvaluate a x
-    | x == 0 && a.expon < 0 = True
-    | otherwise = evaluateAtPoint (trim a) x == evaluateAtPoint a x
+propertyTrimEvaluateAt1 :: (Laurent Int) -> Bool
+propertyTrimEvaluateAt1 a
+    | a.expon < -1000 || a.expon > 1000 = True
+    | otherwise = evaluateAtPoint (trim a) 1 == evaluateAtPoint a 1
 
 // Проверка сложения и вычитания
 propertyMinus :: (Laurent Int) -> Bool
@@ -243,7 +243,7 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyEvaluateMonomial
                          , test propertyTrimNoZeroes
                          , test propertyDoubleTrim
-                         , test propertyTrimEvaluate
+                         , test propertyTrimEvaluateAt1
                          , test propertyMinus
                          , test propertyMinusEvalGF2
                          , test propertyPlusEvalGF2
