@@ -88,7 +88,7 @@ propertyDoubleTrim a = trim (trim a) == trim a
 propertyTrimEvaluate :: (Laurent Int) Int -> Bool
 propertyTrimEvaluate a x
     | x == 0 && a.expon < 0 = True
-    | otherwise = evaluateAtPoint a x == evaluateAtPoint a x
+    | otherwise = evaluateAtPoint (trim a) x == evaluateAtPoint a x
 
 // Проверка сложения и вычитания
 propertyMinus :: (Laurent Int) -> Bool
@@ -251,8 +251,10 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyMinusEvalGF3
                          , test propertyPlusEvalGF3
                          , test propertyMultiplyEvalGF3
-                         , testn 20000 propertyMinusEvalGF127
-                         , testn 20000 propertyPlusEvalGF127
-                         , testn 20000 propertyMultiplyEvalGF127]
+                         , test propertyMinusEvalGF127
+                         , test propertyPlusEvalGF127
+                         , test propertyMultiplyEvalGF127]
 
-          test x = testn 20000 x
+          test x = quietn 20000 aStream x
+          test` x = testn 20000 x
+
