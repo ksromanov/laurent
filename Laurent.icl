@@ -46,11 +46,11 @@ evaluateAtPoint { expon, coeffs } x = pow expon * evaluate_poly x coeffs
 // Стирание лишних нулей с разных сторон
 trim :: (Laurent a) -> (Laurent a) | fromInt a & == a
 trim { expon = expon, coeffs = coeffs } =
-    case coeffs`` of
+    case coeffs_rev of
         [] -> { expon = 0, coeffs = [] }
-        _  -> { expon = expon + length zeroes, coeffs = coeffs`` }
+        _  -> { expon = expon + length zeroes, coeffs = reverse coeffs_rev }
     where (zeroes, coeffs`) = span ((==) zero) coeffs
-          (coeffs``, _)     = span (\a -> not (a == zero)) coeffs`
+          coeffs_rev        = dropWhile ((==) zero) (reverse coeffs`)
 
 // Селекторы и свойства
 // Минимальная и максимальная степени
