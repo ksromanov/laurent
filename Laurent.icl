@@ -10,16 +10,16 @@ import Data.List
 // Коэффициенты [coeffs] отсчитываются от expon выше.
 // Степени в [coeffs] расположены справа налево:
 //      [1, 2, 3] == 3z^2 + 2z + 1
-:: Laurent a = { expon :: Int, coeffs :: !.[a] }
+:: Laurent a = { expon :: !Int, coeffs :: !.[a] }
 
 // Конструкторы (константа, коэффициенты полинома, смещённый полином)
-fromConst :: a -> Laurent a
+fromConst :: !a -> Laurent a
 fromConst x = fromCoeffs [x]
 
-fromCoeffs :: [a] -> Laurent a
+fromCoeffs :: ![a] -> Laurent a
 fromCoeffs coeffs = fromShiftCoeffs 0 coeffs
 
-fromShiftCoeffs :: Int [a] -> Laurent a
+fromShiftCoeffs :: !Int ![a] -> Laurent a
 fromShiftCoeffs expon coeffs = { expon = expon, coeffs = coeffs }
 
 // Вспомогательные значения a
@@ -30,7 +30,7 @@ one :: a | fromInt a
 one = fromInt 1
 
 // Вычисление в точке
-evaluateAtPoint :: (Laurent a) a -> a | fromInt a & +a & *a & /a
+evaluateAtPoint :: !(Laurent a) !a -> a | fromInt a & +a & *a & /a
 evaluateAtPoint { expon, coeffs } x = pow expon * evaluate_poly x coeffs
     where pow n
             | n == 0 = one
@@ -44,7 +44,7 @@ evaluateAtPoint { expon, coeffs } x = pow expon * evaluate_poly x coeffs
                                      (zero, one) coeffs)
 
 // Стирание лишних нулей с разных сторон
-trim :: (Laurent a) -> (Laurent a) | fromInt a & == a
+trim :: !(Laurent a) -> (Laurent a) | fromInt a & == a
 trim { expon = expon, coeffs = coeffs } =
     case coeffs_rev of
         [] -> { expon = 0, coeffs = [] }
@@ -54,14 +54,14 @@ trim { expon = expon, coeffs = coeffs } =
 
 // Селекторы и свойства
 // Минимальная и максимальная степени
-bounds :: (Laurent a) -> (Int, Int)
+bounds :: !(Laurent a) -> (Int, Int)
 bounds { expon, coeffs } = (expon, expon + length coeffs - 1)
 
 // Степень полинома Лорана - разница между его мин и макс степенями
-degree :: (Laurent a) -> Int
+degree :: !(Laurent a) -> Int
 degree { expon = _, coeffs } = length coeffs
 
-shift :: Int (Laurent a) -> (Laurent a)
+shift :: !Int !(Laurent a) -> (Laurent a)
 shift t { expon, coeffs } = { expon = expon + 1, coeffs }
 
 // Красивый вывод на печать, квадратичный по длине (см foldl)
@@ -103,7 +103,7 @@ instance - (Laurent a) | fromInt a & - a & == a where
 // Сложение или вычитание со сдвигом,
 //  позитивный сдвиг - px начинается раньше
 //  негативный сдвиг - py начинается раньше
-opShifted :: (a a -> a) Int [a] [a] -> [a] | fromInt a
+opShifted :: !(a a -> a) !Int ![a] ![a] -> [a] | fromInt a
 opShifted op del px py
     | del > 0  = opShifted op (del - 1) [zero:px] py
     | del == 0 = zipWith` op px py
@@ -137,7 +137,7 @@ instance / (Laurent a) | fromInt a & / a & - a & == a & * a where
     (/) a b = fst (divmod a b)
 
 // Деление полинома a на полином b с остатком. Возвращаемое значение - (частное, остаток)
-divmod :: (Laurent a) (Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a & * a
+divmod :: !(Laurent a) !(Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a & * a
 divmod { expon = exp_a, coeffs = coeffs_a } rawB =
           (trim { expon = exp_a - exp_b, coeffs = reverse (fst poly_divided) },
                         trim { expon = exp_a, coeffs = reverse (snd poly_divided) })
