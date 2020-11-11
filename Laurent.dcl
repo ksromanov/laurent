@@ -25,9 +25,9 @@ instance == (Laurent a) | fromInt a & == a
 instance + (Laurent a) | fromInt a & + a & == a
 instance - (Laurent a) | fromInt a & - a & == a
 instance * (Laurent a) | fromInt a & * a & + a
-instance / (Laurent a) | fromInt a & / a & - a & == a
+instance / (Laurent a) | fromInt a & / a & - a & == a & * a
 
 // Деление с остатком
-divmod :: (Laurent a) (Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a
+divmod :: (Laurent a) (Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a & * a
 
 instance toString (Laurent a) | toString a & toReal a

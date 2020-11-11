@@ -24,6 +24,9 @@ zero = fromInt 0
 one :: a | fromInt a
 one = fromInt 1
 
+isZeroPolynomial :: (Laurent a) -> Bool | fromInt a & == a
+isZeroPolynomial a = (trim a).coeffs == [] || a.coeffs == []
+
 // Limit number of powers to the range [-100, 100]
 // Этот генератор ужасно работает с Real
 ggen{|Laurent|} a state =
@@ -79,7 +82,11 @@ propertyTrimNoZeroes :: (Laurent Int) -> Bool
 propertyTrimNoZeroes a
     | a`.coeffs == [] = True
     | otherwise =
-        hd a`.coeffs <> 0 && hd (reverse a`.coeffs) <> 0
+        hd a`.coeffs <> zero && hd (reverse a`.coeffs) <> zero
+    where a` = trim a
+
+propertyTrimShortens :: (Laurent Int) -> Bool
+propertyTrimShortens a = length a.coeffs >= length a`.coeffs
     where a` = trim a
 
 propertyDoubleTrim :: (Laurent Int) -> Bool
@@ -152,10 +159,18 @@ propertyMultiplyEvalGF127 a b x
     | otherwise =
         evaluateAtPoint a x * evaluateAtPoint b x == evaluateAtPoint (a * b) x
 
+propertyDivideEvalGF127 :: (Laurent FieldGF127) (Laurent FieldGF127) -> Bool
+propertyDivideEvalGF127 a b
+    | isZeroPolynomial b = True
+    | otherwise = d*b + m == a
+        where (d, m) = divmod a b
+
 print a = "[" +++ toString a.expon +++ ": "
     +++ foldl (+++) "" (map (\x -> " " +++ toString x) a.coeffs)
     +++ "]"
 
+////////////////////////////////////////////////////////////
+// Тесты конечных полей.
 propertyGF2PlusMinus :: FieldGF2 FieldGF2 -> Bool
 propertyGF2PlusMinus a b =
        a + b == b + a
@@ -259,8 +274,10 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyMultiplyEvalGF3
                          , test propertyMinusEvalGF127
                          , test propertyPlusEvalGF127
-                         , test propertyMultiplyEvalGF127]
+                         , test propertyMultiplyEvalGF127
+                         , test propertyDivideEvalGF127
+                         , test propertyTrimNoZeroes
+                         , test propertyTrimShortens]
 
           test x = quietn 20000 aStream x
           test` x = testn 20000 x
-
