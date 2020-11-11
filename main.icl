@@ -141,6 +141,12 @@ propertyMultiplyEvalGF3 a b x
     | otherwise =
         evaluateAtPoint a x * evaluateAtPoint b x == evaluateAtPoint (a * b) x
 
+propertyDivideGF3 :: (Laurent FieldGF3) (Laurent FieldGF3) -> Bool
+propertyDivideGF3 a b
+    | isZeroPolynomial b = True
+    | otherwise = d*b + m == a
+        where (d, m) = divmod a b
+
 // Проверка сложения и вычитания на поле GF127
 propertyMinusEvalGF127 :: (Laurent FieldGF127) (Laurent FieldGF127) FieldGF127 -> Bool
 propertyMinusEvalGF127 a b x
@@ -159,8 +165,8 @@ propertyMultiplyEvalGF127 a b x
     | otherwise =
         evaluateAtPoint a x * evaluateAtPoint b x == evaluateAtPoint (a * b) x
 
-propertyDivideEvalGF127 :: (Laurent FieldGF127) (Laurent FieldGF127) -> Bool
-propertyDivideEvalGF127 a b
+propertyDivideGF127 :: (Laurent FieldGF127) (Laurent FieldGF127) -> Bool
+propertyDivideGF127 a b
     | isZeroPolynomial b = True
     | otherwise = d*b + m == a
         where (d, m) = divmod a b
@@ -272,10 +278,11 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyMinusEvalGF3
                          , test propertyPlusEvalGF3
                          , test propertyMultiplyEvalGF3
+                         , test propertyDivideGF3
                          , test propertyMinusEvalGF127
                          , test propertyPlusEvalGF127
                          , test propertyMultiplyEvalGF127
-                         , test propertyDivideEvalGF127
+                         , test propertyDivideGF127
                          , test propertyTrimNoZeroes
                          , test propertyTrimShortens]
 
