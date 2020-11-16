@@ -77,6 +77,11 @@ propertyEvaluateMonomial n c x
     | otherwise = True // отсекаем NaN и прочие глупости
     where expon = (n rem 20) - 10
 
+// Проверка bounds & degree.
+propertyBounds :: Int [FieldGF3] -> Bool
+propertyBounds n coeffs = bounds a == (n, n + length coeffs)
+    where a = fromShiftCoeffs n coeffs
+
 // Проверка trim
 propertyTrimNoZeroes :: (Laurent Int) -> Bool
 propertyTrimNoZeroes a
@@ -267,6 +272,7 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyEvaluateAtPoint0
                          , test propertyEvaluateAtPoint1
                          , test propertyEvaluateMonomial
+                         , test propertyBounds
                          , test propertyTrimNoZeroes
                          , test propertyDoubleTrim
                          , test propertyTrimEvaluateAt1
