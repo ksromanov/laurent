@@ -79,8 +79,15 @@ propertyEvaluateMonomial n c x
 
 // Проверка bounds & degree.
 propertyBounds :: Int [FieldGF3] -> Bool
-propertyBounds n coeffs = bounds a == (n, n + length coeffs)
+propertyBounds n coeffs=:[] = bounds a == (n, n)
     where a = fromShiftCoeffs n coeffs
+
+propertyBounds n coeffs = bounds a == (n, n + length coeffs - 1)
+    where a = fromShiftCoeffs n coeffs
+
+propertyBoundsDegree :: (Laurent FieldGF3) -> Bool
+propertyBoundsDegree a = degree a == upper - lower
+    where (lower, upper) = bounds a
 
 // Проверка trim
 propertyTrimNoZeroes :: (Laurent Int) -> Bool
@@ -273,6 +280,7 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyEvaluateAtPoint1
                          , test propertyEvaluateMonomial
                          , test propertyBounds
+                         , test propertyBoundsDegree
                          , test propertyTrimNoZeroes
                          , test propertyDoubleTrim
                          , test propertyTrimEvaluateAt1

@@ -55,11 +55,13 @@ trim { expon = expon, coeffs = coeffs } =
 // Селекторы и свойства
 // Минимальная и максимальная степени
 bounds :: !(Laurent a) -> (Int, Int)
+bounds { expon, coeffs = [] } = (expon, expon)
 bounds { expon, coeffs } = (expon, expon + length coeffs - 1)
 
 // Степень полинома Лорана - разница между его мин и макс степенями
 degree :: !(Laurent a) -> Int
-degree { expon = _, coeffs } = length coeffs
+degree { expon = _, coeffs = [] } = 0
+degree { expon = _, coeffs } = length coeffs - 1
 
 shift :: !Int !(Laurent a) -> (Laurent a)
 shift t { expon, coeffs } = { expon = expon + 1, coeffs }
