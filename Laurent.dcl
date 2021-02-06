@@ -1,6 +1,6 @@
 definition module Laurent
 
-from StdOverloaded import class fromInt, class +, class *, class /,
+from StdOverloaded import class fromInt, class +, class *, class /, class <,
                           class -, class ==, class toString, class toReal
 
 :: Laurent a = { expon :: !Int, coeffs :: !.[a] }
@@ -30,4 +30,4 @@ instance / (Laurent a) | fromInt a & / a & - a & == a & * a
 // Деление с остатком
 divmod :: !(Laurent a) !(Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a & * a
 
-instance toString (Laurent a) | toString a & toReal a
+instance toString (Laurent a) | toString a & < a & == a & fromInt a

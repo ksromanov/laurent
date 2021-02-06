@@ -67,13 +67,13 @@ shift :: !Int !(Laurent a) -> (Laurent a)
 shift t { expon, coeffs } = { expon = expon + 1, coeffs }
 
 // Красивый вывод на печать, квадратичный по длине (см foldl)
-instance toString (Laurent a) | toString a & toReal a where
+instance toString (Laurent a) | toString a & < a & == a & fromInt a where
     toString { expon, coeffs } = case reverse stringMonomials of
             []     -> "0"
             [(a,_):ax] -> foldl (\r (mono, coeff)
-                                | toReal coeff > 0.0 -> r +++ "+" +++ mono
+                                | zero < coeff -> r +++ "+" +++ mono
                                 | otherwise -> r +++ mono) a ax
-        where expanded = filter (\(_, c) -> toReal c <> 0.0) (zip ([expon..], coeffs))
+        where expanded = filter (\(_, c) -> c <> zero) (zip ([expon..], coeffs))
               stringMonomials = map (\l=:(_, coeff) -> (toStringMono l, coeff)) expanded
               op exp
                 | exp < 0   = '/'
@@ -86,8 +86,8 @@ instance toString (Laurent a) | toString a & toReal a where
                                 exp
                                 (~exp)
               toStringMono (exp, coeff)
-                | (toReal coeff) <> 1.0 && exp <> 0 = toString coeff +++ {op exp} +++ toStringPow exp
-                | (toReal coeff) <> 1.0 = toString coeff +++ toStringPow exp
+                | coeff <> one && exp <> 0 = toString coeff +++ {op exp} +++ toStringPow exp
+                | coeff <> one = toString coeff +++ toStringPow exp
 
                 // Situation when coeff == 1
                 | exp > 0  = toStringPow exp
