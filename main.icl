@@ -194,6 +194,14 @@ propertyGcdDegree a b
     | otherwise = (degree a >= gcdDegree) && (degree b >= gcdDegree)
         where gcdDegree = degree (greatestCommonDivisor a b)
 
+propertyGcdDivisor :: (Laurent FieldGF127) (Laurent FieldGF127) -> Bool
+propertyGcdDivisor a b
+    | isZeroPolynomial a = True
+    | isZeroPolynomial b = True
+    | otherwise = isZeroPolynomial (mod a gcd) && isZeroPolynomial (mod b gcd)
+        where gcd = greatestCommonDivisor a b
+              mod a b = snd (divmod a b)
+
 ////////////////////////////////////////////////////////////
 // Тесты конечных полей.
 propertyGF2PlusMinus :: FieldGF2 FieldGF2 -> Bool
@@ -306,7 +314,8 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyDivideGF127
                          , test propertyTrimNoZeroes
                          , test propertyTrimShortens
-                         , test propertyGcdDegree]
+                         , test propertyGcdDegree
+                         , test propertyGcdDivisor]
 
           test x = quietn 20000 aStream x
           test` x = testn 20000 x

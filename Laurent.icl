@@ -157,12 +157,14 @@ divmod { expon = exp_a, coeffs = coeffs_a } rawB =
 
 // Алгоритм Евклида для нахождения наибольшего общего делителя
 greatestCommonDivisor :: !(Laurent a) !(Laurent a) -> (Laurent a) | fromInt a & / a & - a & == a & * a
-greatestCommonDivisor a b
+greatestCommonDivisor a` b`
     | degree a > degree b = iter a b
     | otherwise = iter b a
 
-    where iter a b
+    where a = trim a`
+          b = trim b`
+          iter a b
             | b == fromConst (fromInt 0) = a
-            | degree b == 1 && degree a == 1 = a
+            | degree b == 0 && degree a == 0 = a
             | otherwise = iter b rem
                 where (quot, rem) = divmod a b
