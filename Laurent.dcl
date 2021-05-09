@@ -30,4 +30,7 @@ instance / (Laurent a) | fromInt a & / a & - a & == a & * a
 // Деление с остатком
 divmod :: !(Laurent a) !(Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a & * a
 
+// Алгоритм Евклида для нахождения наибольшего общего делителя
+greatestCommonDivisor :: !(Laurent a) !(Laurent a) -> (Laurent a) | fromInt a & / a & - a & == a & * a
+
 instance toString (Laurent a) | toString a & < a & == a & fromInt a

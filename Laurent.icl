@@ -154,3 +154,15 @@ divmod { expon = exp_a, coeffs = coeffs_a } rawB =
                    where quotient = a/b
                          residue` = zipWith (\a b -> a - b*quotient) a_rest b_rest ++ drop (len_b) [a:a_rest]
                          (quotient_rest, residue) = go (len_a - 1) residue` len_b bx
+
+// Алгоритм Евклида для нахождения наибольшего общего делителя
+greatestCommonDivisor :: !(Laurent a) !(Laurent a) -> (Laurent a) | fromInt a & / a & - a & == a & * a
+greatestCommonDivisor a b
+    | degree a > degree b = iter a b
+    | otherwise = iter b a
+
+    where iter a b
+            | b == fromConst (fromInt 0) = a
+            | degree b == 1 && degree a == 1 = a
+            | otherwise = iter b rem
+                where (quot, rem) = divmod a b

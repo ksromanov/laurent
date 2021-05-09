@@ -187,6 +187,13 @@ print a = "[" +++ toString a.expon +++ ": "
     +++ foldl (+++) "" (map (\x -> " " +++ toString x) a.coeffs)
     +++ "]"
 
+propertyGcdDegree :: (Laurent FieldGF127) (Laurent FieldGF127) -> Bool
+propertyGcdDegree a b
+    | isZeroPolynomial a = True
+    | isZeroPolynomial b = True
+    | otherwise = (degree a >= gcdDegree) && (degree b >= gcdDegree)
+        where gcdDegree = degree (greatestCommonDivisor a b)
+
 ////////////////////////////////////////////////////////////
 // Тесты конечных полей.
 propertyGF2PlusMinus :: FieldGF2 FieldGF2 -> Bool
@@ -298,7 +305,8 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyMultiplyEvalGF127
                          , test propertyDivideGF127
                          , test propertyTrimNoZeroes
-                         , test propertyTrimShortens]
+                         , test propertyTrimShortens
+                         , test propertyGcdDegree]
 
           test x = quietn 20000 aStream x
           test` x = testn 20000 x
