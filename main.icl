@@ -202,6 +202,24 @@ propertyGcdDivisor a b
         where gcd = greatestCommonDivisor a b
               mod a b = snd (divmod a b)
 
+propertyGcdSelf :: (Laurent FieldGF127) FieldGF127 -> Bool
+propertyGcdSelf a i
+    | i == zero = True
+    | isZeroPolynomial a = True
+    | otherwise = a == greatestCommonDivisor a a
+
+propertyGcdMultiplicative :: (Laurent FieldGF127) (Laurent FieldGF127) -> Bool
+propertyGcdMultiplicative a b
+    | isZeroPolynomial a = True
+    | isZeroPolynomial b = True
+    | otherwise =
+        case (trim q).coeffs of
+          [_]
+            | isZeroPolynomial rem -> True
+            | otherwise -> False
+          _ -> False
+        where (q, rem) = divmod (greatestCommonDivisor a (a*b)) a
+
 ////////////////////////////////////////////////////////////
 // Тесты конечных полей.
 propertyGF2PlusMinus :: FieldGF2 FieldGF2 -> Bool
@@ -315,7 +333,9 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyTrimNoZeroes
                          , test propertyTrimShortens
                          , test propertyGcdDegree
-                         , test propertyGcdDivisor]
+                         , test propertyGcdDivisor
+                         , test propertyGcdSelf
+                         , test propertyGcdMultiplicative]
 
           test x = quietn 20000 aStream x
           test` x = testn 20000 x
