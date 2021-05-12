@@ -139,6 +139,7 @@ instance / (Laurent a) | fromInt a & / a & - a & == a & * a where
     (/) a b = fst (divmod a b)
 
 // Деление полинома a на полином b с остатком. Возвращаемое значение - (частное, остаток)
+// Деление происходит со старшей степени до младшей, как обычный полином.
 divmod :: !(Laurent a) !(Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a & * a
 divmod { expon = exp_a, coeffs = coeffs_a } rawB =
           (trim { expon = exp_a - exp_b, coeffs = reverse (fst poly_divided) },
