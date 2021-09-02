@@ -156,6 +156,10 @@ divmod { expon = exp_a, coeffs = coeffs_a } rawB =
                          residue` = zipWith (\a b -> a - b*quotient) a_rest b_rest ++ drop (len_b) [a:a_rest]
                          (quotient_rest, residue) = go (len_a - 1) residue` len_b bx
 
+inverse :: !(Laurent a) -> (Laurent a)
+inverse a =
+    { expon = 1 - a.expon - length a.coeffs, coeffs = reverse a.coeffs }
+
 // Алгоритм Евклида для нахождения наибольшего общего делителя
 greatestCommonDivisor :: !(Laurent a) !(Laurent a) -> (Laurent a) | fromInt a & / a & - a & == a & * a
 greatestCommonDivisor a` b`

@@ -30,6 +30,9 @@ instance / (Laurent a) | fromInt a & / a & - a & == a & * a
 // Деление с остатком
 divmod :: !(Laurent a) !(Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a & * a
 
+// Инверсия, т.е. преобразование z -> 1/z
+inverse :: !(Laurent a) -> (Laurent a)
+
 // Алгоритм Евклида для нахождения наибольшего общего делителя
 greatestCommonDivisor :: !(Laurent a) !(Laurent a) -> (Laurent a) | fromInt a & / a & - a & == a & * a
 

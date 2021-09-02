@@ -187,6 +187,14 @@ print a = "[" +++ toString a.expon +++ ": "
     +++ foldl (+++) "" (map (\x -> " " +++ toString x) a.coeffs)
     +++ "]"
 
+propertyInverseGF127 :: (Laurent FieldGF127) FieldGF127 -> Bool
+propertyInverseGF127 a x
+    | x == zero = True
+    | otherwise = evaluateAtPoint a x == evaluateAtPoint (inverse a) (one / x)
+
+propertyDoubleInverseGF127 :: (Laurent FieldGF127) -> Bool
+propertyDoubleInverseGF127 a = a == inverse (inverse a)
+
 propertyGcdDegree :: (Laurent FieldGF127) (Laurent FieldGF127) -> Bool
 propertyGcdDegree a b
     | isZeroPolynomial a = True
@@ -332,6 +340,8 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyDivideGF127
                          , test propertyTrimNoZeroes
                          , test propertyTrimShortens
+                         , test propertyInverseGF127
+                         , test propertyDoubleInverseGF127
                          , test propertyGcdDegree
                          , test propertyGcdDivisor
                          , test propertyGcdSelf
