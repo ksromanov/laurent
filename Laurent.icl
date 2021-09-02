@@ -173,3 +173,62 @@ greatestCommonDivisor a` b`
             | degree b == 0 && degree a == 0 = a
             | otherwise = iter b rem
                 where (quot, rem) = divmod a b
+
+
+// Деление со всех сторон с построением полного спектра. Возможны дубликаты.
+// Сначала генерируем полный спектр по stepLowEnd, а потом
+// каждый проходим до конца используя stepHighEnd.
+//
+// Результаты отсортированы по количеству делений с "головы" с убыванием. Т.е.
+// [divModHighEnd,....., divModLowEnd], divModHighEnd = divmod выше.
+//
+// Кодировка - (q, r): q - частное, r - остаток.
+divmodSpectrum :: !(Laurent a) !(Laurent a) -> [(Laurent a, Laurent a)] | * a & /a & - a & fromInt a & == a
+divmodSpectrum a` b`
+    | b == zero = abort "Attempt to divide by zero polynomial."
+    | degree a < degree b = [(zero, a)]
+    | otherwise = map (\(q, r) -> ({ q & expon = a.expon - b.expon }, r)) (iterLowEnd a)
+
+    where (a, b) = (trim a`, trim b`)
+
+          zero :: Laurent a
+          zero = fromCoeffs []
+
+//        iterLowEnd :: !(Laurent a) -> [(Laurent a, Laurent a)]
+          iterLowEnd a
+             | length a.coeffs < length_b = [(zero, a)]
+             | otherwise = [divModHighEnd a : pair_map (append q) (iterLowEnd a`)]
+
+                 where a` = { expon = a.expon + 1, coeffs = subtractList q (tl a.coeffs) (tl b.coeffs)}
+                       q = (hd a.coeffs/hd b.coeffs)
+
+                       pair_map f lst = map (\(x, y) -> (f x, y)) lst
+
+                       append :: !a !(Laurent a) -> Laurent a
+                       append q x = { x & coeffs = [q : x.coeffs] }
+
+                       length_b = length b.coeffs
+
+          // Фактически это просто левое деление на b (со старшей степени).
+          // NOTE: полиномы должны быть "trimmed".
+//        divModHighEnd :: !(Laurent a) -> (Laurent a, Laurent a)
+          divModHighEnd a = (fromShiftCoeffs (a.expon - b.expon) q, // NOTE: q переворачивать не надо!!!!
+                             fromShiftCoeffs a.expon (reverse r))
+
+              where (q, r) = go [] (reverse a.coeffs) reverse_b_coeffs
+                    reverse_b_coeffs = reverse b.coeffs
+
+                    go :: ![a] ![a] ![a] -> ([a], [a]) | * a & - a & /a
+                    go q a b
+                      | length a < length b = (q, a)
+                      | otherwise = go [q_: q] a` b
+                          where (hd_b, tl_b) = (hd b, tl b)
+                                q_ = hd a/hd_b
+                                a` = subtractList q_ (tl a) tl_b
+
+          // Вычитание двух списков коэффициентов.
+          subtractList q a` b` = subtractListInternal a` b`
+              where subtractListInternal [ax:a] [bx:b] = [(ax - bx * q):subtractListInternal a b]
+                    subtractListInternal a [] = a
+                    subtractListInternal [] [_] =
+                      abort "In subtractList a b : degree b > degree a!"

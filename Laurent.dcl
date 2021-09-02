@@ -30,6 +30,9 @@ instance / (Laurent a) | fromInt a & / a & - a & == a & * a
 // Деление с остатком
 divmod :: !(Laurent a) !(Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a & * a
 
+// "Полный" спектр решений деления с остатком
+divmodSpectrum :: !(Laurent a) !(Laurent a) -> [(Laurent a, Laurent a)] | * a & /a & - a & fromInt a & == a
+
 // Инверсия, т.е. преобразование z -> 1/z
 inverse :: !(Laurent a) -> (Laurent a)
 
