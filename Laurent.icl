@@ -141,11 +141,12 @@ instance / (Laurent a) | fromInt a & / a & - a & == a & * a where
 // Деление полинома a на полином b с остатком. Возвращаемое значение - (частное, остаток)
 // Деление происходит со старшей степени до младшей, как обычный полином.
 divmod :: !(Laurent a) !(Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a & * a
-divmod { expon = exp_a, coeffs = coeffs_a } rawB =
+divmod rawA rawB =
           (trim { expon = exp_a - exp_b, coeffs = reverse (fst poly_divided) },
                         trim { expon = exp_a, coeffs = reverse (snd poly_divided) })
 
-       where { expon = exp_b, coeffs = coeffs_b } = trim rawB
+       where { expon = exp_a, coeffs = coeffs_a } = trim rawA
+             { expon = exp_b, coeffs = coeffs_b } = trim rawB
              poly_divided = go (length coeffs_a) (reverse coeffs_a) (length coeffs_b) (reverse coeffs_b)
              go :: Int [a] Int [a] -> ([a], [a]) | fromInt a & / a & == a & -a & *a
              go _ [] _ _ = ([], [])
@@ -173,7 +174,6 @@ greatestCommonDivisor a` b`
             | degree b == 0 && degree a == 0 = a
             | otherwise = iter b rem
                 where (quot, rem) = divmod a b
-
 
 // Деление со всех сторон с построением полного спектра. Возможны дубликаты.
 // Сначала генерируем полный спектр по stepLowEnd, а потом
