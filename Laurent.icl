@@ -141,12 +141,12 @@ instance / (Laurent a) | fromInt a & / a & - a & == a & * a where
 // Деление полинома a на полином b с остатком. Возвращаемое значение - (частное, остаток)
 // Деление происходит со старшей степени до младшей, как обычный полином.
 divmod :: !(Laurent a) !(Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a & * a
-divmod rawA rawB =
+divmod a` b` =
           (trim { expon = exp_a - exp_b, coeffs = reverse (fst poly_divided) },
                         trim { expon = exp_a, coeffs = reverse (snd poly_divided) })
 
-       where { expon = exp_a, coeffs = coeffs_a } = trim rawA
-             { expon = exp_b, coeffs = coeffs_b } = trim rawB
+       where { expon = exp_a, coeffs = coeffs_a } = trim a`
+             { expon = exp_b, coeffs = coeffs_b } = trim b`
              poly_divided = go (length coeffs_a) (reverse coeffs_a) (length coeffs_b) (reverse coeffs_b)
              go :: Int [a] Int [a] -> ([a], [a]) | fromInt a & / a & == a & -a & *a
              go _ [] _ _ = ([], [])
@@ -180,7 +180,7 @@ greatestCommonDivisor a` b`
 // каждый проходим до конца используя stepHighEnd.
 //
 // Результаты отсортированы по количеству делений с "головы" с убыванием. Т.е.
-// [divModHighEnd,....., divModLowEnd], divModHighEnd = divmod выше.
+// [divmodHighEnd,....., divmodLowEnd], divmodHighEnd = divmod выше.
 //
 // Кодировка - (q, r): q - частное, r - остаток.
 divmodSpectrum :: !(Laurent a) !(Laurent a) -> [(Laurent a, Laurent a)] | * a & /a & - a & fromInt a & == a
@@ -197,7 +197,7 @@ divmodSpectrum a` b`
 //        iterLowEnd :: !(Laurent a) -> [(Laurent a, Laurent a)]
           iterLowEnd a
              | length a.coeffs < length_b = [(zero, a)]
-             | otherwise = [divModHighEnd a : pair_map (append q) (iterLowEnd a`)]
+             | otherwise = [divmodHighEnd a : pair_map (append q) (iterLowEnd a`)]
 
                  where a` = { expon = a.expon + 1, coeffs = subtractList q (tl a.coeffs) (tl b.coeffs)}
                        q = (hd a.coeffs/hd b.coeffs)
@@ -211,8 +211,8 @@ divmodSpectrum a` b`
 
           // Фактически это просто левое деление на b (со старшей степени).
           // NOTE: полиномы должны быть "trimmed".
-//        divModHighEnd :: !(Laurent a) -> (Laurent a, Laurent a)
-          divModHighEnd a = (fromShiftCoeffs (a.expon - b.expon) q, // NOTE: q переворачивать не надо!!!!
+//        divmodHighEnd :: !(Laurent a) -> (Laurent a, Laurent a)
+          divmodHighEnd a = (fromShiftCoeffs (a.expon - b.expon) q, // NOTE: q переворачивать не надо!!!!
                              fromShiftCoeffs a.expon (reverse r))
 
               where (q, r) = go [] (reverse a.coeffs) reverse_b_coeffs

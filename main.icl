@@ -192,8 +192,15 @@ propertyDivideSpectrumGF127 a b
 propertyDivideSpectrumIncludesDivideGF127 :: (Laurent FieldGF127) (Laurent FieldGF127) -> Bool
 propertyDivideSpectrumIncludesDivideGF127 a b
     | isZeroPolynomial b = True
-    | otherwise = hd spectrum == divmod a b
+    | otherwise = hd (divmodSpectrum a b) == divmod a b
+
+propertyDivideSpectrumInverseGF127 :: (Laurent FieldGF127) (Laurent FieldGF127) -> Bool
+propertyDivideSpectrumInverseGF127 a b
+    | isZeroPolynomial b = True
+    | otherwise =
+        spectrum == reverse (map (\(d, m) -> (inverse d, inverse m)) inverseSpectrum)
         where spectrum = divmodSpectrum a b
+              inverseSpectrum = divmodSpectrum (inverse a) (inverse b)
 
 print a = "[" +++ toString a.expon +++ ": "
     +++ foldl (+++) "" (map (\x -> " " +++ toString x) a.coeffs)
@@ -352,6 +359,7 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyDivideGF127
                          , test propertyDivideSpectrumGF127
                          , test propertyDivideSpectrumIncludesDivideGF127
+                         , test propertyDivideSpectrumInverseGF127
                          , test propertyTrimNoZeroes
                          , test propertyTrimShortens
                          , test propertyInverseGF127
