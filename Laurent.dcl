@@ -27,7 +27,7 @@ instance - (Laurent a) | fromInt a & - a & == a
 instance * (Laurent a) | fromInt a & * a & + a
 instance / (Laurent a) | fromInt a & / a & - a & == a & * a
 
-// Деление с остатком
+// Деление с остатком со стороны старших степеней
 divmod :: !(Laurent a) !(Laurent a) -> ((Laurent a), (Laurent a)) | fromInt a & / a & - a & == a & * a
 
 // "Полный" спектр решений деления с остатком
@@ -36,7 +36,7 @@ divmodSpectrum :: !(Laurent a) !(Laurent a) -> [(Laurent a, Laurent a)] | * a & 
 // Инверсия, т.е. преобразование z -> 1/z
 inverse :: !(Laurent a) -> (Laurent a)
 
-// Алгоритм Евклида для нахождения наибольшего общего делителя
+// Алгоритм Евклида для нахождения наибольшего общего делителя (используется divmod)
 greatestCommonDivisor :: !(Laurent a) !(Laurent a) -> (Laurent a) | fromInt a & / a & - a & == a & * a
 
 instance toString (Laurent a) | toString a & < a & == a & fromInt a
