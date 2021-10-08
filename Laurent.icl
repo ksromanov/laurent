@@ -12,7 +12,10 @@ import Data.List
 //      [1, 2, 3] == 3z^2 + 2z + 1
 :: Laurent a = { expon :: !Int, coeffs :: !.[a] }
 
-// Конструкторы (константа, коэффициенты полинома, смещённый полином)
+// Конструкторы (нуль, константа, коэффициенты полинома, смещённый полином)
+zeroLaurent :: Laurent a
+zeroLaurent = { expon = 0, coeffs = [] }
+
 fromConst :: !a -> Laurent a
 fromConst x = fromCoeffs [x]
 

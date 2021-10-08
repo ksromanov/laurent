@@ -5,7 +5,8 @@ from StdOverloaded import class fromInt, class +, class *, class /, class <,
 
 :: Laurent a = { expon :: !Int, coeffs :: !.[a] }
 
-// Конструкторы (константа, коэффициенты полинома, смещённый полином)
+// Конструкторы (нуль, константа, коэффициенты полинома, смещённый полином)
+zeroLaurent :: Laurent a
 fromConst :: !a -> Laurent a
 fromCoeffs :: ![a] -> Laurent a
 fromShiftCoeffs :: !Int ![a] -> Laurent a
