@@ -78,12 +78,18 @@ propertyEvaluateMonomial n c x
     where expon = (n rem 20) - 10
 
 // Проверка bounds & degree.
-propertyBounds :: Int [FieldGF3] -> Bool
-propertyBounds n coeffs=:[] = bounds a == (n, n)
+propertyBoundsEmpty :: Int -> Bool
+propertyBoundsEmpty n = bounds a == (n, n)
     where a = fromShiftCoeffs n coeffs
+          coeffs :: [Int]
+          coeffs = []
 
-propertyBounds n coeffs = bounds a == (n, n + length coeffs - 1)
-    where a = fromShiftCoeffs n coeffs
+propertyBounds :: Int [FieldGF3] -> Bool
+propertyBounds n coeffs =
+    case a.coeffs of
+     [] -> bounds a == (n, n)
+     _  -> bounds a == (a.expon, a.expon + length a.coeffs - 1)
+    where a = trim (fromShiftCoeffs n coeffs)
 
 propertyBoundsDegree :: (Laurent FieldGF3) -> Bool
 propertyBoundsDegree a = degree a == upper - lower
@@ -339,6 +345,7 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyEvaluateAtPoint0
                          , test propertyEvaluateAtPoint1
                          , test propertyEvaluateMonomial
+                         , test propertyBoundsEmpty
                          , test propertyBounds
                          , test propertyBoundsDegree
                          , test propertyTrimNoZeroes

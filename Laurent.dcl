@@ -18,8 +18,8 @@ evaluateAtPoint :: !(Laurent a) !a -> a | fromInt a & +a & *a & /a
 trim :: !(Laurent a) -> (Laurent a) | fromInt a & == a
 
 // Селекторы и свойства
-bounds :: !(Laurent a) -> (Int, Int)
-degree :: !(Laurent a) -> Int
+bounds :: !(Laurent a) -> (Int, Int) | == a & fromInt a
+degree :: !(Laurent a) -> Int | == a & fromInt a
 shift :: !Int !(Laurent a) -> (Laurent a)
 
 instance == (Laurent a) | fromInt a & == a

@@ -50,21 +50,25 @@ evaluateAtPoint { expon, coeffs } x = pow expon * evaluate_poly x coeffs
 trim :: !(Laurent a) -> (Laurent a) | fromInt a & == a
 trim { expon = expon, coeffs = coeffs } =
     case coeffs_rev of
-        [] -> { expon = 0, coeffs = [] }
+        [] -> { expon = expon, coeffs = [] }
         _  -> { expon = expon + length zeroes, coeffs = reverse coeffs_rev }
     where (zeroes, coeffs`) = span ((==) zero) coeffs
           coeffs_rev        = dropWhile ((==) zero) (reverse coeffs`)
 
 // Селекторы и свойства
 // Минимальная и максимальная степени
-bounds :: !(Laurent a) -> (Int, Int)
-bounds { expon, coeffs = [] } = (expon, expon)
-bounds { expon, coeffs } = (expon, expon + length coeffs - 1)
+bounds :: !(Laurent a) -> (Int, Int) | == a & fromInt a
+bounds a =: { expon = e } = case coeffs of
+      [] -> (e, e)
+      _  -> (expon, expon + length coeffs - 1)
+    where { expon, coeffs } = trim a
 
 // Степень полинома Лорана - разница между его мин и макс степенями
-degree :: !(Laurent a) -> Int
-degree { expon = _, coeffs = [] } = 0
-degree { expon = _, coeffs } = length coeffs - 1
+degree :: !(Laurent a) -> Int | == a & fromInt a
+degree a = case coeffs of
+      [] -> 0
+      _  -> length coeffs - 1
+    where { coeffs } = trim a
 
 shift :: !Int !(Laurent a) -> (Laurent a)
 shift t { expon, coeffs } = { expon = expon + 1, coeffs }
@@ -118,7 +122,9 @@ opShifted op del px py
           zipWith` op [x:px] [y:py] = [op x y : zipWith` op px py]
 
 instance == (Laurent a) | fromInt a & == a where
-    (==) a b = (a`.expon == b`.expon) && (a`.coeffs == b`.coeffs)
+    (==) a b
+        | a`.coeffs == [] = (a`.coeffs == b`.coeffs)
+        | otherwise = (a`.expon == b`.expon) && (a`.coeffs == b`.coeffs)
                where a` = trim a
                      b` = trim b
 
