@@ -71,7 +71,7 @@ degree a = case coeffs of
     where { coeffs } = trim a
 
 shift :: !Int !(Laurent a) -> (Laurent a)
-shift t { expon, coeffs } = { expon = expon + 1, coeffs }
+shift t { expon, coeffs } = { expon = expon + t, coeffs }
 
 // Красивый вывод на печать, квадратичный по длине (см foldl)
 instance toString (Laurent a) | toString a & < a & == a & fromInt a where

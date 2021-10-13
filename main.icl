@@ -95,6 +95,12 @@ propertyBoundsDegree :: (Laurent FieldGF3) -> Bool
 propertyBoundsDegree a = degree a == upper - lower
     where (lower, upper) = bounds a
 
+// Проверка shift
+propertyShift :: Int (Laurent FieldGF3) -> Bool
+propertyShift n a
+    | isZeroPolynomial a = isZeroPolynomial (shift n a)
+    | otherwise = shift n a / a == fromShiftCoeffs n [FieldGF3 1]
+
 // Проверка trim
 propertyTrimNoZeroes :: (Laurent Int) -> Bool
 propertyTrimNoZeroes a
@@ -348,6 +354,7 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyBoundsEmpty
                          , test propertyBounds
                          , test propertyBoundsDegree
+                         , test propertyShift
                          , test propertyTrimNoZeroes
                          , test propertyDoubleTrim
                          , test propertyTrimEvaluateAt1
