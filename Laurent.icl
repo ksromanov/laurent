@@ -217,7 +217,7 @@ divmodSpectrum a` b`
                        length_b = length b.coeffs
 
           // Фактически это просто левое деление на b (со старшей степени).
-          // NOTE: полиномы должны быть "trimmed".
+          // NOTE: полином b должен быть "trimmed", а полином a - нет.
 //        divmodHighEnd :: !(Laurent a) -> (Laurent a, Laurent a)
           divmodHighEnd a = (fromShiftCoeffs (a.expon - b.expon) q, // NOTE: q переворачивать не надо!!!!
                              fromShiftCoeffs a.expon (reverse r))
