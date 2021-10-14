@@ -176,11 +176,9 @@ greatestCommonDivisor a` b`
     | degree a > degree b = iter a b
     | otherwise = iter b a
 
-    where a = trim a`
-          b = trim b`
+    where (a, b) = (trim a`, trim b`)
           iter a b
-            | b == fromConst (fromInt 0) = a
-            | degree b == 0 && degree a == 0 = a
+            | zeroLaurent == b = a
             | otherwise = iter b rem
                 where (quot, rem) = divmod a b
 
