@@ -173,7 +173,7 @@ inverse a =
 // Алгоритм Евклида для нахождения наибольшего общего делителя
 greatestCommonDivisor :: !(Laurent a) !(Laurent a) -> (Laurent a) | fromInt a & / a & - a & == a & * a
 greatestCommonDivisor a` b`
-    | degree a > degree b = iter a b
+    | degree a >= degree b = iter a b
     | otherwise = iter b a
 
     where (a, b) = (trim a`, trim b`)
