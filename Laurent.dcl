@@ -40,4 +40,7 @@ inverse :: !(Laurent a) -> (Laurent a)
 // Алгоритм Евклида для нахождения наибольшего общего делителя (используется divmod)
 greatestCommonDivisor :: !(Laurent a) !(Laurent a) -> (Laurent a) | fromInt a & / a & - a & == a & * a
 
+// Алгоритм Евклида с полным путём деления (всеми делителями) и произвольным оператором divmod
+greatestCommonDivisorPath :: !((Laurent a) (Laurent a) -> (Laurent a, Laurent a)) !(Laurent a) !(Laurent a) -> [(Laurent a)] | fromInt a & == a
+
 instance toString (Laurent a) | toString a & < a & == a & fromInt a

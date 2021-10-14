@@ -182,6 +182,19 @@ greatestCommonDivisor a` b`
             | otherwise = iter b rem
                 where (quot, rem) = divmod a b
 
+// Алгоритм Евклида для нахождения наибольшего общего делителя, один путь
+//  divmod - функция деления с остатком
+greatestCommonDivisorPath :: !((Laurent a) (Laurent a) -> (Laurent a, Laurent a)) !(Laurent a) !(Laurent a) -> [(Laurent a)] | fromInt a & == a
+greatestCommonDivisorPath divmod a` b`
+    | degree a >= degree b = iter a b
+    | otherwise = iter b a
+
+    where (a, b) = (trim a`, trim b`)
+          iter a b
+            | zeroLaurent == b = [a]
+            | otherwise = [quot : iter b rem]
+                where (quot, rem) = divmod a b
+
 // Деление со всех сторон с построением полного спектра. Возможны дубликаты.
 // Сначала генерируем полный спектр по stepLowEnd, а потом
 // каждый проходим до конца используя stepHighEnd.
