@@ -259,9 +259,9 @@ propertyGcdMultiplicative a b
           _ -> False
         where (q, rem) = divmod (greatestCommonDivisor a (a*b)) a
 
-// Тесты Euclid Path - сведение к Gcd
-propertyEuclidPathLeadsToGcd :: !(Laurent FieldGF127) !(Laurent FieldGF127) -> Bool
-propertyEuclidPathLeadsToGcd a b
+// Тесты GCD Path - сведение к Gcd
+propertyGcdPathLeadsToGcd :: !(Laurent FieldGF127) !(Laurent FieldGF127) -> Bool
+propertyGcdPathLeadsToGcd a b
     | isZeroPolynomial a || isZeroPolynomial b = True
     | otherwise = greatestCommonDivisor a b ==
                     hd (reverse (greatestCommonDivisorPath divmod a b))
@@ -389,7 +389,7 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyGcdDivisor
                          , test propertyGcdSelf
                          , test propertyGcdMultiplicative
-                         , test propertyEuclidPathLeadsToGcd]
+                         , test propertyGcdPathLeadsToGcd]
 
           test x = quietn 20000 aStream x
           test` x = testn 20000 x
