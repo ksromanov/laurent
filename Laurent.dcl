@@ -43,4 +43,7 @@ greatestCommonDivisor :: !(Laurent a) !(Laurent a) -> (Laurent a) | fromInt a & 
 // Алгоритм Евклида с полным путём деления (всеми делителями) и произвольным оператором divmod
 greatestCommonDivisorPath :: !((Laurent a) (Laurent a) -> (Laurent a, Laurent a)) !(Laurent a) !(Laurent a) -> [(Laurent a)] | fromInt a & == a
 
+// Восстанавливаем a и b по пути greatestCommonDivisorPath.
+walkbackGreatestCommonDivisorPath :: ![Laurent a] -> (Laurent a, Laurent a) | fromInt a & + a & == a & * a
+
 instance toString (Laurent a) | toString a & < a & == a & fromInt a

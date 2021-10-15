@@ -195,6 +195,13 @@ greatestCommonDivisorPath divmod a` b`
             | otherwise = [quot : iter b rem]
                 where (quot, rem) = divmod a b
 
+// Восстанавливаем a и b по пути greatestCommonDivisorPath.
+walkbackGreatestCommonDivisorPath :: ![Laurent a] -> (Laurent a, Laurent a) | fromInt a & + a & == a & * a
+walkbackGreatestCommonDivisorPath path = case reverse path of
+    [r : tl] -> foldl (\(a, b) quot -> (a * quot + b, a)) (r, zeroLaurent) tl
+
+    [] -> abort "Empty path in inverseEuclidAlgorithm"
+
 // Деление со всех сторон с построением полного спектра. Возможны дубликаты.
 // Сначала генерируем полный спектр по stepLowEnd, а потом
 // каждый проходим до конца используя stepHighEnd.
