@@ -266,6 +266,14 @@ propertyGcdPathLeadsToGcd a b
     | otherwise = greatestCommonDivisor a b ==
                     hd (reverse (greatestCommonDivisorPath divmod a b))
 
+propertyGcdPathWalkback :: !(Laurent FieldGF127) !(Laurent FieldGF127) -> Bool
+propertyGcdPathWalkback a` b`
+    | isZeroPolynomial a || isZeroPolynomial b = True
+    | degree a < degree b = True
+    | otherwise = walkbackGreatestCommonDivisorPath (greatestCommonDivisorPath divmod a b) == (a, b)
+    where (a, b) = (trim a`, trim b`)
+
+
 ////////////////////////////////////////////////////////////
 // Тесты конечных полей.
 propertyGF2PlusMinus :: FieldGF2 FieldGF2 -> Bool
@@ -389,7 +397,8 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyGcdDivisor
                          , test propertyGcdSelf
                          , test propertyGcdMultiplicative
-                         , test propertyGcdPathLeadsToGcd]
+                         , test propertyGcdPathLeadsToGcd
+                         , test propertyGcdPathWalkback]
 
           test x = quietn 20000 aStream x
           test` x = testn 20000 x
