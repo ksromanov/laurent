@@ -46,4 +46,11 @@ greatestCommonDivisorPath :: !((Laurent a) (Laurent a) -> (Laurent a, Laurent a)
 // Восстанавливаем a и b по пути greatestCommonDivisorPath.
 walkbackGreatestCommonDivisorPath :: ![Laurent a] -> (Laurent a, Laurent a) | fromInt a & + a & == a & * a
 
+// Дерево полного спектра путей алгоритма Евклида для полиномов Лорана
+:: EuclidSpectrum a = EuclidSpectrumStep [(Laurent a, EuclidSpectrum a)]
+                    | EuclidSpectrumEnd (Laurent a)
+
+// Построение полного дерева алгоритма Евклида с использованием divmodSpectrum
+greatestCommonDivisorSpectrum :: !(Laurent a) !(Laurent a) -> EuclidSpectrum a | fromInt a & / a & - a & == a & * a
+
 instance toString (Laurent a) | toString a & < a & == a & fromInt a

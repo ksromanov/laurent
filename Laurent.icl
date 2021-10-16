@@ -259,3 +259,19 @@ divmodSpectrum a` b`
                     subtractListInternal a [] = a
                     subtractListInternal [] [_] =
                       abort "In subtractList a b : degree b > degree a!"
+
+// Дерево полного спектра путей алгоритма Евклида для полиномов Лорана
+:: EuclidSpectrum a = EuclidSpectrumStep [(Laurent a, EuclidSpectrum a)]
+                    | EuclidSpectrumEnd (Laurent a)
+
+// Построение полного дерева алгоритма Евклида с использованием divmodSpectrum
+greatestCommonDivisorSpectrum :: !(Laurent a) !(Laurent a) -> EuclidSpectrum a | fromInt a & / a & - a & == a & * a
+greatestCommonDivisorSpectrum a` b`
+    | degree a >= degree b = iter a b
+    | otherwise = iter b a
+
+    where (a, b) = (trim a`, trim b`)
+          iter a b
+            | b == zeroLaurent = EuclidSpectrumEnd a
+            | otherwise = EuclidSpectrumStep (map (\(quot, rem) -> (quot, iter b rem)) spectrum)
+                where spectrum = divmodSpectrum a b
