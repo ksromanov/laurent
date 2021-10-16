@@ -273,6 +273,18 @@ propertyGcdPathWalkback a` b`
     | otherwise = walkbackGreatestCommonDivisorPath (greatestCommonDivisorPath divmod a b) == (a, b)
     where (a, b) = (trim a`, trim b`)
 
+propertyGCDSpectrumContainsPath :: !(Laurent FieldGF127) !(Laurent FieldGF127) -> Bool
+propertyGCDSpectrumContainsPath a b
+    | isZeroPolynomial a || isZeroPolynomial b = True
+    | otherwise = go path spectrum
+        where path     = greatestCommonDivisorPath divmod a b
+              spectrum = greatestCommonDivisorSpectrum a b
+
+              go :: ![Laurent a] !(EuclidSpectrum a) -> Bool | fromInt a & == a
+              go [a] (EuclidSpectrumEnd b) = a == b
+              go [a:path] (EuclidSpectrumStep step) =
+                  any (\(b, next) -> a == b && go path next) step
+              go _ _ = False
 
 ////////////////////////////////////////////////////////////
 // Тесты конечных полей.
@@ -398,7 +410,8 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyGcdSelf
                          , test propertyGcdMultiplicative
                          , test propertyGcdPathLeadsToGcd
-                         , test propertyGcdPathWalkback]
+                         , test propertyGcdPathWalkback
+                         , test propertyGCDSpectrumContainsPath]
 
           test x = quietn 20000 aStream x
           test` x = testn 20000 x
