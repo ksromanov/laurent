@@ -286,6 +286,19 @@ propertyGCDSpectrumContainsPath a b
                   any (\(b, next) -> a == b && go path next) step
               go _ _ = False
 
+propertyGCDSpectrumInverse :: !(Laurent FieldGF127) !(Laurent FieldGF127) -> Bool
+propertyGCDSpectrumInverse a b
+    | isZeroPolynomial a || isZeroPolynomial b = True
+    | degree a < degree b = True
+    | otherwise = go [] spectrum
+        where spectrum = greatestCommonDivisorSpectrum a b
+
+//              go :: ![Laurent a] (EuclidSpectrum a) -> Bool
+              go rev_path (EuclidSpectrumEnd end) =
+                (a, b) == walkbackGreatestCommonDivisorPath (reverse [end:rev_path])
+              go rev_path (EuclidSpectrumStep step) =
+                  all (\(cur, next) -> go [cur:rev_path] next) step
+
 ////////////////////////////////////////////////////////////
 // Тесты конечных полей.
 propertyGF2PlusMinus :: FieldGF2 FieldGF2 -> Bool
@@ -411,7 +424,8 @@ Start = laurentTests //++ gfFieldsTests
                          , test propertyGcdMultiplicative
                          , test propertyGcdPathLeadsToGcd
                          , test propertyGcdPathWalkback
-                         , test propertyGCDSpectrumContainsPath]
+                         , test propertyGCDSpectrumContainsPath
+                         , test propertyGCDSpectrumInverse]
 
           test x = quietn 20000 aStream x
           test` x = testn 20000 x
